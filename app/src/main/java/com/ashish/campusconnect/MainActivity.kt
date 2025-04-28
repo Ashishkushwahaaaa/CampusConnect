@@ -18,7 +18,7 @@ import com.ashish.campusconnect.ui.theme.CampusConnectTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
             CampusConnectTheme {

@@ -76,6 +76,9 @@ dependencies {
 
     implementation("androidx.compose.runtime:runtime-livedata:1.5.2")
 
+    // Firebase Storage
+    implementation ("com.google.firebase:firebase-storage-ktx")
+
 
 // Coil (optional) for image loading
     implementation("io.coil-kt:coil-compose:2.4.0")
