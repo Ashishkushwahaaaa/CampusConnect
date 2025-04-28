@@ -5,11 +5,16 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.ashish.campusconnect.data.Post
+import com.ashish.campusconnect.viewmodel.HomeViewModel
 
 @Composable
-fun NavigationGraph(modifier: Modifier,navController: NavHostController){
-    NavHost(navController = navController, startDestination = Screen.SignUpScreen.route){
+fun NavigationGraph(
+    modifier: Modifier,
+    navController: NavHostController,
+    homeViewModel: HomeViewModel,
+    startDestination: String)
+{
+    NavHost(navController = navController, startDestination = startDestination){
         composable(Screen.SignUpScreen.route){
             SignUpScreen(
                 onNavigateToLogin = { navController.navigate(Screen.LoginScreen.route) },
@@ -29,8 +34,7 @@ fun NavigationGraph(modifier: Modifier,navController: NavHostController){
         composable(Screen.HomeScreen.route){
             HomeScreen(
                 onPostClick = { post ->
-                    navController.currentBackStackEntry?.savedStateHandle?.set("post", post)
-                    navController.navigate("details")
+                    navController.navigate("post_details_screen/${post.id}")
                 },
                 onCreatePostClick = { navController.navigate(Screen.PostScreen.route) }
             )
@@ -42,11 +46,13 @@ fun NavigationGraph(modifier: Modifier,navController: NavHostController){
             )
         }
 
-        composable(Screen.PostDetailsScreen.route) {
-            val post = navController.previousBackStackEntry?.savedStateHandle?.get<Post>("post")
-            post?.let {
-                PostDetailsScreen(post = it)
+        composable("post_details_screen/{postId}") { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("postId")
+            postId?.let {
+                val post = homeViewModel.getPostById(it) // Fetch post by ID
+                post?.let { PostDetailsScreen(post = it) }
             }
         }
+
     }
 }

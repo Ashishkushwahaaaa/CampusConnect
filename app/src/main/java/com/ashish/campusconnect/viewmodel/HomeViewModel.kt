@@ -24,12 +24,19 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val snapshot = firestore.collection("posts").get().await()
-                val postsList = snapshot.documents.mapNotNull { it.toObject(Post::class.java) }
+                val postsList = snapshot.documents.mapNotNull {  document ->
+                    val post = document.toObject(Post::class.java)
+                    post?.copy(id = document.id) // Set the document ID as the post ID
+                }
                 _posts.value = postsList.sortedByDescending { it.timestamp }
             } catch (e: Exception) {
                 // Handle error if needed
             }
         }
+    }
+
+    fun getPostById(postId: String): Post? {
+        return _posts.value.find { it.id == postId }
     }
 
     fun refreshPosts() {
