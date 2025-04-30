@@ -12,7 +12,6 @@ import kotlinx.coroutines.tasks.await
 class HomeViewModel : ViewModel() {
 
     private val firestore = FirebaseFirestore.getInstance()
-
     private val _posts = MutableStateFlow<List<Post>>(emptyList())
     val posts: StateFlow<List<Post>> = _posts
 
@@ -35,9 +34,9 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun getPostById(postId: String): Post? {
-        return _posts.value.find { it.id == postId }
-    }
+//    fun getPostById(postId: String): Post? {
+//        return _posts.value.find { it.id == postId }
+//    }
 
     fun refreshPosts() {
         fetchPosts()

@@ -13,8 +13,4 @@ data class Post(
 
     @ServerTimestamp
     val timestamp: Timestamp? = null
-
-//    val timestamp: Long = System.currentTimeMillis(),
-
-
 )

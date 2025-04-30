@@ -40,7 +40,6 @@ class PostViewModel : ViewModel() {
                 // Upload Thumbnail if available
                 thumbnailUri?.let {
                     thumbnailUrl = repository.uploadThumbnail(it)
-//                    thumbnailUrl = repository.uploadThumbnail(thumbnailUri) ?: "https://images.app.goo.gl/QLSbi2XZ4iTUXhNG9"
                 }
 
                 // Upload each attachment
@@ -57,9 +56,7 @@ class PostViewModel : ViewModel() {
                     thumbnailUrl = thumbnailUrl,
                     attachmentUrls = attachmentUrls
                 )
-
                 repository.uploadPost(post)
-
                 _postState.value = PostUploadState.Success
             } catch (e: Exception) {
                 _postState.value = PostUploadState.Error(e.message ?: "Unknown error")

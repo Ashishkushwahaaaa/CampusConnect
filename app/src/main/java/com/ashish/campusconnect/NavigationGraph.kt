@@ -1,33 +1,90 @@
 package com.ashish.campusconnect
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.ashish.campusconnect.data.SessionManager
 import com.ashish.campusconnect.viewmodel.HomeViewModel
+import com.ashish.campusconnect.viewmodel.PostDetailsViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun NavigationGraph(
     modifier: Modifier,
-    navController: NavHostController,
-    homeViewModel: HomeViewModel,
-    startDestination: String)
+    navController: NavHostController)
 {
-    NavHost(navController = navController, startDestination = startDestination){
+    NavHost(navController = navController, startDestination = Screen.SplashScreen.route){
+
+        composable(Screen.SplashScreen.route){
+            val context = LocalContext.current
+            val sessionManager = remember { SessionManager(context) }
+            val isGuest by sessionManager.isGuest.collectAsState(initial = null)
+            val currentUser = FirebaseAuth.getInstance().currentUser
+
+            if (isGuest != null) {
+                SplashScreen(onNavigate = {
+                    if (isGuest == true) {
+                        navController.navigate(Screen.HomeScreen.route) {
+                            popUpTo(Screen.SplashScreen.route) { inclusive = true }
+                        }
+                    } else if (currentUser != null) {
+                        // Logged in and not guest → go to Home
+                        navController.navigate(Screen.HomeScreen.route) {
+                            popUpTo(Screen.SplashScreen.route) { inclusive = true }
+                        }
+                    } else {
+                        // Not guest, but not logged in → go to Login
+                        navController.navigate(Screen.LoginScreen.route) {
+                            popUpTo(Screen.SplashScreen.route) { inclusive = true }
+                        }
+                    }
+                })
+            } else {
+                SplashScreen(onNavigate = {})
+            }
+        }
+
         composable(Screen.SignUpScreen.route){
             SignUpScreen(
-                onNavigateToLogin = { navController.navigate(Screen.LoginScreen.route) },
-                onSignUpSuccess = { navController.navigate(Screen.LoginScreen.route) },
-                onNavigateToHome = { navController.navigate(Screen.HomeScreen.route) }
+                onNavigateToLogin = { navController.navigate(Screen.LoginScreen.route){
+                    popUpTo(Screen.SignUpScreen.route) { inclusive = true }
+                } },
+                onSignUpSuccess = { navController.navigate(Screen.LoginScreen.route){
+                    //Here i am not using popUpTo() because it was creating confusion as the
+                    // first screen was LoginScreen and also the current screen was login and
+                    // hence functionality was not as expectedly working.So manually popped up last two screen from the stack
+                    navController.popBackStack()
+                    navController.popBackStack()
+                } },
+                onNavigateToHome = { navController.navigate(Screen.HomeScreen.route){
+                    popUpTo(Screen.LoginScreen.route) { inclusive = true }
+                } }
             )
         }
 
         composable(Screen.LoginScreen.route){
             LoginScreen(
-                onNavigateToSignUp = { navController.navigate(Screen.SignUpScreen.route) },
-                onSignInSuccess = {navController.navigate(Screen.HomeScreen.route)},
-                onNavigateToHome = {navController.navigate(Screen.HomeScreen.route)}
+                onNavigateToSignUp = { navController.navigate(Screen.SignUpScreen.route)},
+                onSignInSuccess = {navController.navigate(Screen.HomeScreen.route){
+                    popUpTo(Screen.LoginScreen.route) { inclusive = true }
+                } },
+                onNavigateToHome = {navController.navigate(Screen.HomeScreen.route){
+                    popUpTo(Screen.LoginScreen.route) { inclusive = true }
+                } }
             )
 
         }
@@ -47,12 +104,29 @@ fun NavigationGraph(
         }
 
         composable("post_details_screen/{postId}") { backStackEntry ->
-            val postId = backStackEntry.arguments?.getString("postId")
-            postId?.let {
-                val post = homeViewModel.getPostById(it) // Fetch post by ID
-                post?.let { PostDetailsScreen(post = it) }
+            val postId = backStackEntry.arguments?.getString("postId") ?: return@composable
+            val viewModel: PostDetailsViewModel = viewModel()
+            val post by viewModel.post.collectAsState()
+            val loading by viewModel.loading.collectAsState()
+
+            LaunchedEffect(postId) {
+                viewModel.loadPost(postId)
+            }
+            when {
+                loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+                post != null -> {
+                    PostDetailsScreen(post = post!!)
+                }
+                else -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Post not found", style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
             }
         }
-
     }
 }

@@ -5,6 +5,8 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -13,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ashish.campusconnect.viewmodel.PostViewModel
 import com.ashish.campusconnect.viewmodel.PostUploadState
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -109,9 +112,6 @@ import kotlinx.coroutines.launch
 //    }
 //}
 
-
-
-
 @Composable
 fun PostScreen(onPostUploaded: () -> Unit) {
     val viewModel: PostViewModel = viewModel()
@@ -122,6 +122,8 @@ fun PostScreen(onPostUploaded: () -> Unit) {
     var description by remember { mutableStateOf("") }
     var thumbnailUri by remember { mutableStateOf<Uri?>(null) }
     var attachmentUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
+    val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email ?: "unknown@user.com"
+
 
     val thumbnailPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -144,7 +146,11 @@ fun PostScreen(onPostUploaded: () -> Unit) {
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())) {
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
@@ -158,7 +164,10 @@ fun PostScreen(onPostUploaded: () -> Unit) {
             value = description,
             onValueChange = { description = it },
             label = { Text("Description") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 100.dp, max = 200.dp), // limit height
+            maxLines = 10
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -173,17 +182,27 @@ fun PostScreen(onPostUploaded: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = {
-            viewModel.uploadPost(
-                title = title,
-                description = description,
-                authorEmail = "demo@gmail.com", // Replace with logged-in user's email
-                thumbnailUri = thumbnailUri,
-                attachmentUris = attachmentUris
-            )
-        }, modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = {
+                viewModel.uploadPost(
+                    title = title,
+                    description = description,
+                    authorEmail = currentUserEmail,
+                    thumbnailUri = thumbnailUri,
+                    attachmentUris = attachmentUris
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = postState.value !is PostUploadState.Loading
+        ) {
             if (postState.value is PostUploadState.Loading) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier
+                        .size(20.dp)
+                )
+                Text("Uploading...", style = MaterialTheme.typography.bodyMedium)
             } else {
                 Text("Upload Post")
             }

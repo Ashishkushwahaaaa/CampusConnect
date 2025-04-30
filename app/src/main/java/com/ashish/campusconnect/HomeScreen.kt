@@ -71,12 +71,8 @@ fun HomeScreen(
     }
 }
 
-
-
 @Composable
 fun PostItem(post: Post, onClick: () -> Unit) {
-
-//    val thumbnailUrl = if(post.thumbnailUrl.isNotEmpty()) post.thumbnailUrl else "https://images.app.goo.gl/pfrmS2GBAD8ekQRT9"
 
     Card(
         modifier = Modifier
@@ -89,25 +85,12 @@ fun PostItem(post: Post, onClick: () -> Unit) {
             modifier = Modifier.padding(16.dp)
         ) {
 
-
-//            if (post.thumbnailUrl.isNotEmpty()) {
-//                Image(
-//                    painter = rememberAsyncImagePainter(thumbnailUrl),
-//                    contentDescription = "Thumbnail",
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(180.dp),
-//                    contentScale = ContentScale.Crop
-//                )
-//            }
-
-
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(post.thumbnailUrl)
-                    .crossfade(true)
+                    .crossfade(600)
                     .error(R.drawable.default_thumbnail) // fallback to local drawable if image fails
-                    .placeholder(R.drawable.default_thumbnail) // optional: show while loading
+                    .placeholder(R.drawable.baseline_downloading_24) // optional: show while loading
                     .build(),
                 contentDescription = "Thumbnail",
                 contentScale = ContentScale.Crop,
@@ -115,9 +98,6 @@ fun PostItem(post: Post, onClick: () -> Unit) {
                     .fillMaxWidth()
                     .height(180.dp)
             )
-
-
-
 
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = post.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)

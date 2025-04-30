@@ -36,7 +36,6 @@ import kotlinx.coroutines.launch
 fun LoginScreen(authViewModel: AuthViewModel = viewModel(),onNavigateToSignUp: ()-> Unit,onSignInSuccess: () -> Unit, onNavigateToHome: () -> Unit){
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-//    val result by authViewModel.authResult.observeAsState()
     val authResult by authViewModel.authResult.observeAsState()
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
@@ -49,7 +48,7 @@ fun LoginScreen(authViewModel: AuthViewModel = viewModel(),onNavigateToSignUp: (
         verticalArrangement = Arrangement.Center
     ) {
         Button(onClick = {
-            //TODO Add navigation to home screen to see only posts
+            //Add navigation to home screen to see only posts
             coroutineScope.launch {
                 sessionManager.setGuestMode(true)
                 // Navigate to Home Screen
@@ -84,7 +83,6 @@ fun LoginScreen(authViewModel: AuthViewModel = viewModel(),onNavigateToSignUp: (
             onNavigateToSignUp()
         })
 
-
         authResult?.let { result ->
             LaunchedEffect(result) {
                 when (result) {
@@ -103,10 +101,4 @@ fun LoginScreen(authViewModel: AuthViewModel = viewModel(),onNavigateToSignUp: (
         }
 
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview(){
-//    LoginScreen ({})
 }

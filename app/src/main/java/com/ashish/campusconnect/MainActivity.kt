@@ -41,9 +41,7 @@ class MainActivity : ComponentActivity() {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                         NavigationGraph(
                             modifier = Modifier.padding(innerPadding),
-                            navController = navController,
-                            homeViewModel = homeViewModel,
-                            startDestination = startDestination
+                            navController = navController
                         )
                     }
                 }
