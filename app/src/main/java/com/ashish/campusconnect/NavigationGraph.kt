@@ -6,10 +6,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -21,20 +22,23 @@ import com.ashish.campusconnect.data.SessionManager
 import com.ashish.campusconnect.viewmodel.HomeViewModel
 import com.ashish.campusconnect.viewmodel.PostDetailsViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun NavigationGraph(
     modifier: Modifier,
     navController: NavHostController)
 {
+    val context = LocalContext.current
+    val sessionManager = remember { SessionManager(context) }
+    val isGuest by sessionManager.isGuest.collectAsState(initial = null)
+    val coroutineScope = rememberCoroutineScope()
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
     NavHost(navController = navController, startDestination = Screen.SplashScreen.route){
 
         composable(Screen.SplashScreen.route){
-            val context = LocalContext.current
-            val sessionManager = remember { SessionManager(context) }
-            val isGuest by sessionManager.isGuest.collectAsState(initial = null)
-            val currentUser = FirebaseAuth.getInstance().currentUser
-
             if (isGuest != null) {
                 SplashScreen(onNavigate = {
                     if (isGuest == true) {
@@ -93,7 +97,25 @@ fun NavigationGraph(
                 onPostClick = { post ->
                     navController.navigate("post_details_screen/${post.id}")
                 },
-                onCreatePostClick = { navController.navigate(Screen.PostScreen.route) }
+                onCreatePostClick = { navController.navigate(Screen.PostScreen.route) },
+                onGuestLogin = {
+                    coroutineScope.launch{
+                        sessionManager.setGuestMode(false)
+                        navController.navigate(Screen.LoginScreen.route){
+                            popUpTo(Screen.HomeScreen.route) { inclusive = true }
+                        }
+                    }
+                },
+                onUserLogout = {
+                    coroutineScope.launch{
+                        sessionManager.setGuestMode(true) // switching to GuestMode, you can set it as false to behave as new user
+                        FirebaseAuth.getInstance().signOut()
+
+                        navController.navigate(Screen.LoginScreen.route){
+                            popUpTo(Screen.HomeScreen.route) { inclusive = true }
+                        }
+                    }
+                }
             )
         }
 

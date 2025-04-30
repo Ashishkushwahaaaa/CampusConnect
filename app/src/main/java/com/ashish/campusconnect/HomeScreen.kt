@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,26 +28,61 @@ import com.ashish.campusconnect.data.SessionManager
 @Composable
 fun HomeScreen(
     onPostClick: (Post) -> Unit,
-    onCreatePostClick: () -> Unit
+    onCreatePostClick: () -> Unit,
+    onGuestLogin: () -> Unit,
+    onUserLogout:()->Unit
 ) {
     val viewModel: HomeViewModel = viewModel()
     val posts by viewModel.posts.collectAsState()
-
-
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
     val isGuest by sessionManager.isGuest.collectAsState(initial = false)
+    var showLogoutDialog by remember{mutableStateOf(false)}
 
 
     LaunchedEffect(true) {
         viewModel.refreshPosts()
     }
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = { Text("Logout") },
+            text = { Text("Are you sure you want to logout?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showLogoutDialog = false
+                        onUserLogout()
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Campus News") }
+                title = { Text("Campus Connect", fontWeight = FontWeight.ExtraBold)},
+                actions = {
+                    if (isGuest){
+                        IconButton(onClick = { onGuestLogin() }) {
+                            Icon(Icons.Default.AccountCircle, contentDescription = "Login")
+                        }
+                    }else{
+                        IconButton(onClick = {showLogoutDialog = true}) {
+                            Icon(Icons.Default.AccountCircle, contentDescription = "Logout")
+                        }
+                    }
+                }
             )
+
         },
         floatingActionButton =  {
             if(!isGuest){
