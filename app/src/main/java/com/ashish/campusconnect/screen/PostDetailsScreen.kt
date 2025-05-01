@@ -1,18 +1,25 @@
-package com.ashish.campusconnect
+package com.ashish.campusconnect.screen
 
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.ashish.campusconnect.R
 import com.ashish.campusconnect.data.Post
 
 @Composable
@@ -26,19 +33,29 @@ fun PostDetailsScreen(post: Post) {
     ) {
         item {
             if (post.thumbnailUrl.isNotEmpty()) {
-                Image(
-                    painter = rememberAsyncImagePainter(post.thumbnailUrl),
-                    contentDescription = "Thumbnail",
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(250.dp)
-                )
+                        .heightIn(max = 740.dp)
+                        .background(Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(post.thumbnailUrl)
+                            .crossfade(600)
+                            .error(R.drawable.default_thumbnail) // fallback to local drawable if image fails
+                            .build(),
+                        contentDescription = "Image",
+                        contentScale = ContentScale.FillWidth,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
             Text(text = post.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
-
             Text(text = post.description, style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(16.dp))
 

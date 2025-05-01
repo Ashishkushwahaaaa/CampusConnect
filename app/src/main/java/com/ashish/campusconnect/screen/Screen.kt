@@ -1,4 +1,4 @@
-package com.ashish.campusconnect
+package com.ashish.campusconnect.screen
 
 sealed class Screen (val route: String){
     object SplashScreen: Screen("splash_screen")

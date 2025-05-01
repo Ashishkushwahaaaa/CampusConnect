@@ -1,4 +1,4 @@
-package com.ashish.campusconnect
+package com.ashish.campusconnect.screen
 
 import android.content.Intent
 import android.net.Uri
@@ -66,12 +66,20 @@ fun PostScreen(onPostUploaded: () -> Unit) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        val maxTitleChar = 150
         item {
             OutlinedTextField(
                 value = title,
-                onValueChange = { title = it },
-                label = { Text("Title") },
-                modifier = Modifier.fillMaxWidth()
+                onValueChange = {
+                    if(it.length <= maxTitleChar){
+                        title = it
+                    }
+                },
+                label = { Text("Title (${maxTitleChar-title.length} chars max) ") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(64.dp, 200.dp),
+                maxLines = 3
             )
         }
 

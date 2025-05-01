@@ -1,4 +1,4 @@
-package com.ashish.campusconnect
+package com.ashish.campusconnect.screen
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable

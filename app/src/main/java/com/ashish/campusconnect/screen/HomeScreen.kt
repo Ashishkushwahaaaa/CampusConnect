@@ -1,6 +1,5 @@
-package com.ashish.campusconnect
+package com.ashish.campusconnect.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,16 +9,16 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.ashish.campusconnect.R
 import com.ashish.campusconnect.data.Post
 import com.ashish.campusconnect.viewmodel.HomeViewModel
 import com.ashish.campusconnect.data.SessionManager
@@ -136,9 +135,9 @@ fun PostItem(post: Post, onClick: () -> Unit) {
             )
 
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = post.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(text = post.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = post.description, maxLines = 2, style = MaterialTheme.typography.bodyMedium)
+            Text(text = post.description, maxLines = 2, style = MaterialTheme.typography.bodyMedium, overflow = TextOverflow.Ellipsis)
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.ashish.campusconnect
+package com.ashish.campusconnect.screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,17 +19,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ashish.campusconnect.data.SessionManager
-import com.ashish.campusconnect.viewmodel.HomeViewModel
 import com.ashish.campusconnect.viewmodel.PostDetailsViewModel
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun NavigationGraph(
-    modifier: Modifier,
-    navController: NavHostController)
-{
+fun NavigationGraph(modifier: Modifier, navController: NavHostController){
+
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
     val isGuest by sessionManager.isGuest.collectAsState(initial = null)
@@ -64,34 +60,45 @@ fun NavigationGraph(
 
         composable(Screen.SignUpScreen.route){
             SignUpScreen(
-                onNavigateToLogin = { navController.navigate(Screen.LoginScreen.route){
-                    popUpTo(Screen.SignUpScreen.route) { inclusive = true }
-                } },
-                onSignUpSuccess = { navController.navigate(Screen.LoginScreen.route){
-                    //Here i am not using popUpTo() because it was creating confusion as the
-                    // first screen was LoginScreen and also the current screen was login and
-                    // hence functionality was not as expectedly working.So manually popped up last two screen from the stack
-                    navController.popBackStack()
-                    navController.popBackStack()
-                } },
-                onNavigateToHome = { navController.navigate(Screen.HomeScreen.route){
-                    popUpTo(Screen.LoginScreen.route) { inclusive = true }
-                } }
+                onNavigateToLogin = {
+                    navController.navigate(Screen.LoginScreen.route) {
+                        popUpTo(Screen.SignUpScreen.route) { inclusive = true }
+                    }
+                },
+                onSignUpSuccess = {
+                    navController.navigate(Screen.LoginScreen.route) {
+                        //Here i am not using popUpTo() because it was creating confusion as the
+                        // first screen was LoginScreen and also the current screen was login and
+                        // hence functionality was not as expectedly working.So manually popped up last two screen from the stack
+                        navController.popBackStack()
+                        navController.popBackStack()
+                    }
+                },
+                onNavigateToHome = {
+                    navController.navigate(Screen.HomeScreen.route) {
+                        popUpTo(Screen.LoginScreen.route) { inclusive = true }
+                    }
+                }
             )
         }
 
         composable(Screen.LoginScreen.route){
             LoginScreen(
-                onNavigateToSignUp = { navController.navigate(Screen.SignUpScreen.route)},
-                onSignInSuccess = {navController.navigate(Screen.HomeScreen.route){
-                    popUpTo(Screen.LoginScreen.route) { inclusive = true }
-                } },
-                onNavigateToHome = {navController.navigate(Screen.HomeScreen.route){
-                    popUpTo(Screen.LoginScreen.route) { inclusive = true }
-                } }
+                onNavigateToSignUp = { navController.navigate(Screen.SignUpScreen.route) },
+                onSignInSuccess = {
+                    navController.navigate(Screen.HomeScreen.route) {
+                        popUpTo(Screen.LoginScreen.route) { inclusive = true }
+                    }
+                },
+                onNavigateToHome = {
+                    navController.navigate(Screen.HomeScreen.route) {
+                        popUpTo(Screen.LoginScreen.route) { inclusive = true }
+                    }
+                }
             )
 
         }
+
         composable(Screen.HomeScreen.route){
             HomeScreen(
                 onPostClick = { post ->
@@ -99,19 +106,19 @@ fun NavigationGraph(
                 },
                 onCreatePostClick = { navController.navigate(Screen.PostScreen.route) },
                 onGuestLogin = {
-                    coroutineScope.launch{
+                    coroutineScope.launch {
                         sessionManager.setGuestMode(false)
-                        navController.navigate(Screen.LoginScreen.route){
+                        navController.navigate(Screen.LoginScreen.route) {
                             popUpTo(Screen.HomeScreen.route) { inclusive = true }
                         }
                     }
                 },
                 onUserLogout = {
-                    coroutineScope.launch{
+                    coroutineScope.launch {
                         sessionManager.setGuestMode(true) // switching to GuestMode, you can set it as false to behave as new user
                         FirebaseAuth.getInstance().signOut()
 
-                        navController.navigate(Screen.LoginScreen.route){
+                        navController.navigate(Screen.LoginScreen.route) {
                             popUpTo(Screen.HomeScreen.route) { inclusive = true }
                         }
                     }

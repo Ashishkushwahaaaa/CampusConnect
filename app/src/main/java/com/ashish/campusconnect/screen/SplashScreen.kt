@@ -1,4 +1,4 @@
-package com.ashish.campusconnect
+package com.ashish.campusconnect.screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
