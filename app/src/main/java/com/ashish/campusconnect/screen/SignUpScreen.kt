@@ -149,9 +149,3 @@ fun SignUpScreen(authViewModel: AuthViewModel = viewModel(),onNavigateToLogin: (
 
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun SignUpPreview(){
-//    SignUpScreen({})
-}
