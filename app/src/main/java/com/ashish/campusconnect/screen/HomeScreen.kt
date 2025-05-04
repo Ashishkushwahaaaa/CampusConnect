@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -22,6 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -29,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -37,6 +40,8 @@ import com.ashish.campusconnect.R
 import com.ashish.campusconnect.data.Post
 import com.ashish.campusconnect.viewmodel.HomeViewModel
 import com.ashish.campusconnect.data.SessionManager
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +57,6 @@ fun HomeScreen(
     val sessionManager = remember { SessionManager(context) }
     val isGuest by sessionManager.isGuest.collectAsState(initial = false)
     var showLogoutDialog by remember{mutableStateOf(false)}
-
 
     LaunchedEffect(true) {
         viewModel.refreshPosts()
@@ -79,6 +83,8 @@ fun HomeScreen(
             }
         )
     }
+
+    val upvotedPosts = remember { mutableStateListOf<String>() }
 
     Scaffold(
         topBar = {
@@ -113,25 +119,43 @@ fun HomeScreen(
             }
         }
     ) { padding ->
+
         LazyColumn(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(10.dp)
         ) {
+
             items(posts) { post ->
-                PostItem(post = post, onClick = { onPostClick(post) })
+                PostItem(post = post, onClick = { onPostClick(post) },
+
+                    upvotedPosts = upvotedPosts)
             }
         }
     }
 }
 
+
+//format time and date
+fun formatTimestamp(date: java.util.Date?): String {
+    return if (date != null) {
+        val sdf = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
+        sdf.format(date)
+    } else {
+        "Unknown"
+    }
+}
+
 @Composable
-fun PostItem(post: Post, onClick: () -> Unit) {
+
+fun PostItem(post: Post, onClick: () -> Unit,upvotedPosts: SnapshotStateList<String>) {
+    var localUpvotes by remember { mutableStateOf(post.upvotes) }
+    val hasUpvoted = remember { mutableStateOf(upvotedPosts.contains(post.id))}
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 10.dp)
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.white)),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -139,6 +163,7 @@ fun PostItem(post: Post, onClick: () -> Unit) {
         Column(
             modifier = Modifier.padding(4.dp)
         ) {
+
 
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -151,20 +176,66 @@ fun PostItem(post: Post, onClick: () -> Unit) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .height(200.dp)
                     .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
             )
             //Only showing title or description(if title is not given) on the home screen
             if(post.title!=""){
-                Text(text = post.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 8.dp))
+                Text(text = post.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 8.dp)
+                )
             }else{
-                Text(text = post.description, maxLines = 2, style = MaterialTheme.typography.bodyMedium, overflow = TextOverflow.Ellipsis,modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 8.dp))
+                Text(text = post.description,
+                    maxLines = 2,
+                    style = MaterialTheme.typography.bodyMedium,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 8.dp)
+                )
             }
+
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(text = post.authorEmail, style = MaterialTheme.typography.bodySmall)
-                Text(text = post.timestamp?.toDate().toString(), style = MaterialTheme.typography.bodySmall)
+                //Text(text = post.timestamp?.toDate().toString(), style = MaterialTheme.typography.bodySmall)
+                Text(text = formatTimestamp(post.timestamp?.toDate()), style = MaterialTheme.typography.bodySmall)
+
             }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(2.dp),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                var hasUpvoted = false
+                IconButton(onClick = {
+
+                    if (!hasUpvoted) {
+                        localUpvotes++
+                        hasUpvoted= true
+                        upvotedPosts.add(post.id)
+                        // TODO: Trigger ViewModel to persist vote in backend
+                    }
+                },
+                    enabled = !hasUpvoted
+
+
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ThumbUp,
+                        contentDescription = "Upvote"
+                    )
+                }
+                Text(
+                    text = localUpvotes.toString(),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.alignByBaseline()
+                )
+            }
+
         }
     }
 }

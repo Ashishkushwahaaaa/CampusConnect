@@ -10,6 +10,7 @@ data class Post(
     val authorEmail: String = "",
     var thumbnailUrl: String = "",
     val attachmentUrls: List<String> = emptyList(),
+    var upvotes: Int = 0,
 
     @ServerTimestamp
     val timestamp: Timestamp? = null
