@@ -48,7 +48,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                         }
                     } else {
                         // Not guest, but not logged in → go to Login
-                        navController.navigate(Screen.LoginScreen.route) {
+                        navController.navigate(Screen.SignUpScreen.route) {
                             popUpTo(Screen.SplashScreen.route) { inclusive = true }
                         }
                     }
@@ -56,6 +56,25 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
             } else {
                 SplashScreen(onNavigate = {})
             }
+        }
+
+        composable(Screen.CampusIdVerificationScreen.route){
+            CampusIdVerificationScreen(
+                onVerified = { role, campusId ->
+                    navController.navigate(Screen.SignUpScreen.route) {
+                        popUpTo(Screen.CampusIdVerificationScreen.route) { inclusive = true }
+                    }
+                },
+                onGuestContinue = {
+                    coroutineScope.launch {
+                        sessionManager.setGuestMode(true)
+                        navController.navigate(Screen.HomeScreen.route) {
+                            popUpTo(Screen.CampusIdVerificationScreen.route) { inclusive = true }
+
+                        }
+                    }
+                }
+            )
         }
 
         composable(Screen.SignUpScreen.route){
@@ -74,7 +93,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                         navController.popBackStack()
                     }
                 },
-                onNavigateToHome = {
+                onGuestContinue = {
                     navController.navigate(Screen.HomeScreen.route) {
                         popUpTo(Screen.LoginScreen.route) { inclusive = true }
                     }
