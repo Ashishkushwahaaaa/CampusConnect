@@ -24,6 +24,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -147,10 +148,9 @@ fun formatTimestamp(date: java.util.Date?): String {
 }
 
 @Composable
-
-fun PostItem(post: Post, onClick: () -> Unit,upvotedPosts: SnapshotStateList<String>) {
+fun PostItem(post: Post, onClick: () -> Unit, upvotedPosts: SnapshotStateList<String>) {
     var localUpvotes by remember { mutableStateOf(post.upvotes) }
-    val hasUpvoted = remember { mutableStateOf(upvotedPosts.contains(post.id))}
+    var hasUpvoted by remember { mutableStateOf(upvotedPosts.contains(post.id)) }
 
     Card(
         modifier = Modifier
@@ -160,17 +160,14 @@ fun PostItem(post: Post, onClick: () -> Unit,upvotedPosts: SnapshotStateList<Str
         colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.white)),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(4.dp)
-        ) {
-
+        Column(modifier = Modifier.padding(4.dp)) {
 
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(post.thumbnailUrl)
                     .crossfade(400)
-                    .error(R.drawable.default_thumbnail) // fallback to local drawable if image fails
-                    .placeholder(R.drawable.baseline_arrow_down_24) // optional: show while loading
+                    .error(R.drawable.default_thumbnail)
+                    .placeholder(R.drawable.baseline_arrow_down_24)
                     .build(),
                 contentDescription = "Thumbnail",
                 contentScale = ContentScale.Crop,
@@ -179,17 +176,19 @@ fun PostItem(post: Post, onClick: () -> Unit,upvotedPosts: SnapshotStateList<Str
                     .height(200.dp)
                     .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
             )
-            //Only showing title or description(if title is not given) on the home screen
-            if(post.title!=""){
-                Text(text = post.title,
+
+            if (post.title.isNotEmpty()) {
+                Text(
+                    text = post.title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 8.dp)
                 )
-            }else{
-                Text(text = post.description,
+            } else {
+                Text(
+                    text = post.description,
                     maxLines = 2,
                     style = MaterialTheme.typography.bodyMedium,
                     overflow = TextOverflow.Ellipsis,
@@ -198,44 +197,45 @@ fun PostItem(post: Post, onClick: () -> Unit,upvotedPosts: SnapshotStateList<Str
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(text = post.authorEmail, style = MaterialTheme.typography.bodySmall)
-                //Text(text = post.timestamp?.toDate().toString(), style = MaterialTheme.typography.bodySmall)
                 Text(text = formatTimestamp(post.timestamp?.toDate()), style = MaterialTheme.typography.bodySmall)
-
             }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(2.dp),
-                horizontalArrangement = Arrangement.Start
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                var hasUpvoted = false
                 IconButton(onClick = {
-
-                    if (!hasUpvoted) {
+                    hasUpvoted = !hasUpvoted
+                    if (hasUpvoted) {
                         localUpvotes++
-                        hasUpvoted= true
                         upvotedPosts.add(post.id)
-                        // TODO: Trigger ViewModel to persist vote in backend
+                        // TODO: Persist upvote in backend
+                    } else {
+                        localUpvotes--
+                        upvotedPosts.remove(post.id)
+                        // TODO: Remove upvote from backend
                     }
-                },
-                    enabled = !hasUpvoted
-
-
-                ) {
+                }) {
                     Icon(
                         imageVector = Icons.Default.ThumbUp,
-                        contentDescription = "Upvote"
+                        contentDescription = "Upvote",
+                        tint = if (hasUpvoted) colorResource(R.color.thumb_green) else colorResource(R.color.thumb_gray)
                     )
                 }
                 Text(
                     text = localUpvotes.toString(),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.alignByBaseline()
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
-
         }
     }
 }
