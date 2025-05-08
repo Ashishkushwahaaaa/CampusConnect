@@ -1,5 +1,6 @@
 package com.ashish.campusconnect.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,16 +24,15 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -41,8 +41,11 @@ import com.ashish.campusconnect.R
 import com.ashish.campusconnect.data.Post
 import com.ashish.campusconnect.viewmodel.HomeViewModel
 import com.ashish.campusconnect.data.SessionManager
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,10 +61,12 @@ fun HomeScreen(
     val sessionManager = remember { SessionManager(context) }
     val isGuest by sessionManager.isGuest.collectAsState(initial = false)
     var showLogoutDialog by remember{mutableStateOf(false)}
+    val upvotedPosts by viewModel.upvotedPostIds.collectAsState()
 
     LaunchedEffect(true) {
         viewModel.refreshPosts()
     }
+
     if (showLogoutDialog) {
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
@@ -84,8 +89,6 @@ fun HomeScreen(
             }
         )
     }
-
-    val upvotedPosts = remember { mutableStateListOf<String>() }
 
     Scaffold(
         topBar = {
@@ -128,14 +131,16 @@ fun HomeScreen(
         ) {
 
             items(posts) { post ->
-                PostItem(post = post, onClick = { onPostClick(post) },
-
-                    upvotedPosts = upvotedPosts)
+                PostItem(
+                    post = post,
+                    onClick = { onPostClick(post) },
+                    upvotedPosts = upvotedPosts,
+                    onUpvoteClick = { viewModel.toggleUpvote(it) }
+                )
             }
         }
     }
 }
-
 
 //format time and date
 fun formatTimestamp(date: java.util.Date?): String {
@@ -148,9 +153,18 @@ fun formatTimestamp(date: java.util.Date?): String {
 }
 
 @Composable
-fun PostItem(post: Post, onClick: () -> Unit, upvotedPosts: SnapshotStateList<String>) {
+fun PostItem(
+    post: Post,
+    onClick: () -> Unit,
+    upvotedPosts: Set<String>,
+    onUpvoteClick: (Post) -> Unit
+) {
+    val auth = remember { FirebaseAuth.getInstance() }
+    val user = auth.currentUser
+    val context = LocalContext.current
+
     var localUpvotes by remember { mutableStateOf(post.upvotes) }
-    var hasUpvoted by remember { mutableStateOf(upvotedPosts.contains(post.id)) }
+    val hasUpvoted = upvotedPosts.contains(post.id)
 
     Card(
         modifier = Modifier
@@ -161,7 +175,6 @@ fun PostItem(post: Post, onClick: () -> Unit, upvotedPosts: SnapshotStateList<St
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(4.dp)) {
-
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(post.thumbnailUrl)
@@ -176,7 +189,6 @@ fun PostItem(post: Post, onClick: () -> Unit, upvotedPosts: SnapshotStateList<St
                     .height(200.dp)
                     .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
             )
-
             if (post.title.isNotEmpty()) {
                 Text(
                     text = post.title,
@@ -195,7 +207,6 @@ fun PostItem(post: Post, onClick: () -> Unit, upvotedPosts: SnapshotStateList<St
                     modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 8.dp)
                 )
             }
-
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier
@@ -206,33 +217,30 @@ fun PostItem(post: Post, onClick: () -> Unit, upvotedPosts: SnapshotStateList<St
                 Text(text = post.authorEmail, style = MaterialTheme.typography.bodySmall)
                 Text(text = formatTimestamp(post.timestamp?.toDate()), style = MaterialTheme.typography.bodySmall)
             }
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(2.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {
-                    hasUpvoted = !hasUpvoted
-                    if (hasUpvoted) {
-                        localUpvotes++
-                        upvotedPosts.add(post.id)
-                        // TODO: Persist upvote in backend
-                    } else {
-                        localUpvotes--
-                        upvotedPosts.remove(post.id)
-                        // TODO: Remove upvote from backend
+                IconButton(
+                    onClick = {
+                        if (user == null) {
+                            Toast.makeText(context, "Login to upvote", Toast.LENGTH_SHORT).show()
+                        } else {
+                            localUpvotes += if (hasUpvoted) -1 else 1
+                            onUpvoteClick(post)
+                        }
                     }
-                }) {
+                ) {
                     Icon(
                         imageVector = Icons.Default.ThumbUp,
                         contentDescription = "Upvote",
-                        tint = if (hasUpvoted) colorResource(R.color.thumb_green) else colorResource(R.color.thumb_gray)
+                        tint = if (hasUpvoted) Color.Green else Color.Gray
                     )
                 }
                 Text(
-                    text = localUpvotes.toString(),
+                    text = if (localUpvotes == 0) "" else localUpvotes.toString(),
                     style = MaterialTheme.typography.bodySmall
                 )
             }

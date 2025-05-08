@@ -13,5 +13,5 @@ data class Post(
     var upvotes: Int = 0,
 
     @ServerTimestamp
-    val timestamp: Timestamp? = null
+    val timestamp: Timestamp? = null,
 )

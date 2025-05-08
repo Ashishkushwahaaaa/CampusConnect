@@ -28,7 +28,7 @@ class PostViewModel : ViewModel() {
         description: String,
         authorEmail: String,
         thumbnailUri: Uri?,
-        attachmentUris: List<Uri>
+        attachmentUris: List<Uri>,
     ) {
         viewModelScope.launch {
             try {

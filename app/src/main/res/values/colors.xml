@@ -11,6 +11,7 @@
     <color name="background_container_color_1">#E96B68</color>
     <color name="background_container_color_2">#FCD2D2</color>
     <color name="thumb_green">#E55BE253</color>
+    <color name="thumb_up">#FF00FF00</color>
     <color name="thumb_gray">#E6A5A8A5</color>
 
 </resources>

@@ -21,8 +21,9 @@ class PostRepository(
         return ref.downloadUrl.await().toString()
     }
     suspend fun uploadPost(post: Post): Boolean {
-        firestore.collection("posts").add(post).await()
+        val postRef = firestore.collection("posts").document()
+        val postWithId = post.copy(id = postRef.id)
+        postRef.set(postWithId).await()
         return true
     }
 }
-
