@@ -48,7 +48,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                         }
                     } else {
                         // Not guest, but not logged in → go to Login
-                        navController.navigate(Screen.LoginScreen.route) {
+                        navController.navigate(Screen.SignUpScreen.route) {
                             popUpTo(Screen.SplashScreen.route) { inclusive = true }
                         }
                     }
@@ -57,7 +57,6 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                 SplashScreen(onNavigate = {})
             }
         }
-
         composable(Screen.SignUpScreen.route){
             SignUpScreen(
                 onNavigateToLogin = {
@@ -74,7 +73,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                         navController.popBackStack()
                     }
                 },
-                onNavigateToHome = {
+                onGuestContinue = {
                     navController.navigate(Screen.HomeScreen.route) {
                         popUpTo(Screen.LoginScreen.route) { inclusive = true }
                     }
