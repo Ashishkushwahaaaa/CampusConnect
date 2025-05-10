@@ -57,26 +57,6 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                 SplashScreen(onNavigate = {})
             }
         }
-
-        composable(Screen.CampusIdVerificationScreen.route){
-            CampusIdVerificationScreen(
-                onVerified = { role, campusId ->
-                    navController.navigate(Screen.SignUpScreen.route) {
-                        popUpTo(Screen.CampusIdVerificationScreen.route) { inclusive = true }
-                    }
-                },
-                onGuestContinue = {
-                    coroutineScope.launch {
-                        sessionManager.setGuestMode(true)
-                        navController.navigate(Screen.HomeScreen.route) {
-                            popUpTo(Screen.CampusIdVerificationScreen.route) { inclusive = true }
-
-                        }
-                    }
-                }
-            )
-        }
-
         composable(Screen.SignUpScreen.route){
             SignUpScreen(
                 onNavigateToLogin = {
