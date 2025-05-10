@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -37,162 +38,6 @@ import kotlinx.coroutines.launch
 import com.ashish.campusconnect.data.Result
 import com.ashish.campusconnect.R
 import kotlinx.coroutines.delay
-
-//@Composable
-//fun SignUpScreen(
-//    authViewModel: AuthViewModel = viewModel(),
-//    onNavigateToLogin: () -> Unit,
-//    onSignUpSuccess: () -> Unit,
-//    onGuestContinue: () -> Unit
-//) {
-//    var selectedRole by remember { mutableStateOf("student") } // Default role
-//    var campusId by remember { mutableStateOf("") }
-//    var isCampusIdVerified by remember { mutableStateOf(false) }
-//
-//    var email by remember { mutableStateOf("") }
-//    var password by remember { mutableStateOf("") }
-//    var firstName by remember { mutableStateOf("") }
-//    var lastName by remember { mutableStateOf("") }
-//
-//    val context = LocalContext.current
-//    val coroutineScope = rememberCoroutineScope()
-//    val authResult by authViewModel.authResult.observeAsState()
-//    val verifyResult by authViewModel.campusIdVerifyResult.observeAsState()
-//
-//    Column(
-//        modifier = Modifier.fillMaxSize().padding(16.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Top
-//    ) {
-//        Row(
-//            modifier = Modifier.fillMaxWidth(),
-//            horizontalArrangement = Arrangement.End
-//        ) {
-//            TextButton(onClick = onGuestContinue) {
-//                Text("Continue as Guest")
-//            }
-//        }
-//
-//        OutlinedTextField(
-//            value = campusId,
-//            onValueChange = { campusId = it },
-//            label = {
-//                if(selectedRole=="student") Text("Enter Your University Roll No.")
-//                else if(selectedRole=="faculty") Text("Enter Your Faculty ID")
-//                else Text("Enter Admin Password")
-//            },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(vertical = 8.dp)
-//        )
-//        Row(
-//            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-//            horizontalArrangement = Arrangement.SpaceEvenly
-//        ) {
-//            listOf("student", "faculty", "admin").forEach { role ->
-//                Button(
-//                    onClick = { selectedRole = role },
-//                    enabled = selectedRole != role
-//                ) {
-//                    Text(role)
-//                }
-//            }
-//        }
-//
-//        Button(
-//            onClick = {
-//                coroutineScope.launch {
-//                    authViewModel.verifyCampusId(role = selectedRole, campusId = campusId)
-//                }
-//            },
-//            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-//        ) {
-//            Text("Verify")
-//        }
-//
-//        verifyResult?.let { result ->
-//            when (result) {
-//                is Result.Success -> {
-//                    isCampusIdVerified = true
-//                    Text("ID verified for $selectedRole", modifier = Modifier.padding(8.dp), color = colorResource(R.color.verify_green))
-//                }
-//                is Result.Error -> {
-//                    isCampusIdVerified = false
-//                    Text("Verification Failed: ${result.exception.message}", modifier = Modifier.padding(8.dp))
-//                }
-//            }
-//        }
-//
-//        if (isCampusIdVerified) {
-//            OutlinedTextField(
-//                value = firstName,
-//                onValueChange = { firstName = it },
-//                label = { Text("First Name") },
-//                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-//            )
-//            OutlinedTextField(
-//                value = lastName,
-//                onValueChange = { lastName = it },
-//                label = { Text("Last Name") },
-//                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-//            )
-//            OutlinedTextField(
-//                value = email,
-//                onValueChange = { email = it },
-//                label = { Text("Email") },
-//                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-//            )
-//            OutlinedTextField(
-//                value = password,
-//                onValueChange = { password = it },
-//                label = { Text("Password") },
-//                visualTransformation = PasswordVisualTransformation(),
-//                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-//            )
-//
-//            Button(
-//                onClick = {
-//                    authViewModel.signUp(email, password, firstName, lastName, campusId)
-//                },
-//                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-//            ) {
-//                Text("Sign Up")
-//            }
-//        }
-//
-//        Spacer(modifier = Modifier.padding(16.dp))
-//        Text(
-//            text = "Already have an account? Sign in.",
-//            modifier = Modifier.clickable { onNavigateToLogin() }
-//        )
-//
-//        authResult?.let { result ->
-//            LaunchedEffect(result) {
-//                when (result) {
-//                    is Result.Success -> {
-//                        Toast.makeText(
-//                            context,
-//                            "Registration Successful. Login to explore",
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                        onSignUpSuccess()
-//                    }
-//                    is Result.Error -> {
-//                        Toast.makeText(
-//                            context,
-//                            "Sign Up Failed: ${result.exception.message}",
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-
-
-
-
 
 @Composable
 fun SignUpScreen(
@@ -223,11 +68,10 @@ fun SignUpScreen(
     val emailVerificationSent by authViewModel.emailVerificationSent.observeAsState()
     val emailVerifiedResult by authViewModel.emailVerified.observeAsState()
 
-//    var pollingCompleted by remember { mutableStateOf(false) }
-
     val isEmailVerifyButtonEnabled by authViewModel.isEmailVerifyButtonEnabled.observeAsState(true)
     val pollingCompleted by authViewModel.isPollingCompleted.observeAsState(false)
 
+    var manualCheckRequested by remember { mutableStateOf(false) }
 
 
     // 🔁 Automatically reset verification if ID or role changes
@@ -251,7 +95,7 @@ fun SignUpScreen(
             horizontalArrangement = Arrangement.End
         ) {
             TextButton(onClick = onGuestContinue) {
-                Text("Continue as Guest")
+                Text("Continue as Guest", color = Color.Blue)
             }
         }
 
@@ -402,34 +246,16 @@ fun SignUpScreen(
                 }
             }
 
-            // Show status or prompt to check inbox
+            // Show status or prompt to check inbox for email verification
             emailVerificationSent?.let {
                 when (it) {
-                    is Result.Success -> Text("Verification email sent. Please check your inbox.")
-                    is Result.Error -> Text("Failed to send verification: ${it.exception.message}")
+                    is Result.Success -> Text("Verification email sent on ${email.substringBefore("@")} confirm to proceed", color = Color.Green)
+                    is Result.Error -> Text("${it.exception.message}" , color = Color.Red)
                     else -> {}
                 }
             }
 
-            // Start checking periodically only after email is sent
-//            LaunchedEffect(emailVerificationSent) {
-//                if (emailVerificationSent is Result.Success) {
-//                    repeat(10) { // check 10 times (about 50 seconds total)
-//                        delay(5000) // wait 5 seconds between checks
-//                        authViewModel.checkEmailVerified()
-//
-//                        val result = authViewModel.emailVerified.value
-//                        if (result is Result.Success && result.data) {
-//                            pollingCompleted = false
-//                            return@LaunchedEffect // email is verified, stop polling
-//                        }
-//                    }
-//                    // polling ended and not verified
-//                    pollingCompleted = true
-//                }
-//            }
-
-
+            //Checking whether the email verified or not
             when (val result = emailVerifiedResult) {
                 is Result.Success -> {
                     if (result.data) {
@@ -451,22 +277,46 @@ fun SignUpScreen(
                         }) {
                             Text("Finish Registration")
                         }
+                    }else if (pollingCompleted) {
+                        // If email is not verified and polling has ended
+                        Text("Email not verified yet.")
+                        Button(onClick = {
+                            manualCheckRequested = true
+                            authViewModel.checkEmailVerifiedManually()
+                        }) {
+                            Text("Done")
+                        }
                     }
                 }
-
                 is Result.Error -> {
-                    if(pollingCompleted) {
-                        Text("Email verification failed: ${result.exception.message}")
+                    if (pollingCompleted) {
+                        Text("Check Your Inbox to Verify the Email")
+                        Button(onClick = {
+                            manualCheckRequested = true
+                            authViewModel.checkEmailVerifiedManually()
+                        }) {
+                            Text("Done")
+                        }
                     }
                 }
-
-                null -> {} // no result yet
+                null -> {
+                    if (pollingCompleted) {
+                        Text("Email verification not confirmed.")
+                        Button(onClick = {
+                            manualCheckRequested = true
+                            authViewModel.checkEmailVerifiedManually()
+                        }) {
+                            Text("Done")
+                        }
+                    }
+                } // no result yet
             }
 
             Spacer(modifier = Modifier.padding(16.dp))
 
             Text(
                 text = "Already have an account? Sign in.",
+                color = Color.Blue,
                 modifier = Modifier.clickable { onNavigateToLogin() }
             )
 
@@ -495,4 +345,3 @@ fun SignUpScreen(
         }
     }
 }
-

@@ -6,16 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ashish.campusconnect.data.Result
 import com.ashish.campusconnect.data.UserRepository
-import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import java.util.UUID
 
 class AuthViewModel: ViewModel() {
     private val userRepository = UserRepository(
@@ -75,20 +69,28 @@ class AuthViewModel: ViewModel() {
     }
 
     fun onEmailChanged() {
+//        FirebaseAuth.getInstance().currentUser?.delete()
         _emailVerified.value = null
         _emailVerificationSent.value = null
         _isPollingCompleted.value = false
         _isEmailVerifyButtonEnabled.value = true
     }
 
-//    private fun generateTempPassword(): String {
-//        return UUID.randomUUID().toString() + "Ab1!"
-//    }
-
     fun checkEmailVerified() {
         viewModelScope.launch {
-            _emailVerified.value =
-                userRepository.checkEmailVerified()
+            _emailVerified.value = userRepository.checkEmailVerified()
+        }
+    }
+
+    fun checkEmailVerifiedManually() {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        currentUser?.reload()?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val isVerified = currentUser.isEmailVerified
+                _emailVerified.value = Result.Success(isVerified)
+            } else {
+                _emailVerified.value = Result.Error(task.exception ?: Exception("Reload failed"))
+            }
         }
     }
 
