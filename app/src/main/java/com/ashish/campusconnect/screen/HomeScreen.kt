@@ -18,6 +18,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -90,6 +92,13 @@ fun HomeScreen(
         )
     }
 
+    val navItems = listOf(
+        BottomNavItem.Home,
+        BottomNavItem.Profile,
+        BottomNavItem.Event
+    )
+    var selectedItem by remember { mutableStateOf(0) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -121,7 +130,25 @@ fun HomeScreen(
                     )
                 }
             }
-        }
+        }git
+
+            NavigationBar {
+                navItems.forEachIndexed { index, item ->
+                    NavigationBarItem(
+                        icon = { Icon(item.icon, contentDescription = item.label) },
+                        label = { Text(item.label) },
+                        selected = selectedItem == index,
+                        onClick = {
+                            selectedItem = index
+                            // Handle navigation based on item.route
+                            // e.g. navController.navigate(item.route)
+                        }
+                    )
+                }
+            }
+
+
+
     ) { padding ->
 
         LazyColumn(
