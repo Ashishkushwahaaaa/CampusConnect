@@ -18,6 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ashish.campusconnect.data.SessionManager
 import com.ashish.campusconnect.viewmodel.PostDetailsViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -31,10 +32,13 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
     val isGuest by sessionManager.isGuest.collectAsState(initial = null)
     val coroutineScope = rememberCoroutineScope()
     val currentUser = FirebaseAuth.getInstance().currentUser
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
-    NavHost(navController = navController, startDestination = Screen.SplashScreen.route){
 
-        composable(Screen.SplashScreen.route){
+    NavHost(navController = navController, startDestination = Screen.SplashScreen.route) {
+
+        composable(Screen.SplashScreen.route) {
             if (isGuest != null) {
                 SplashScreen(onNavigate = {
                     if (isGuest == true) {
@@ -57,7 +61,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                 SplashScreen(onNavigate = {})
             }
         }
-        composable(Screen.SignUpScreen.route){
+        composable(Screen.SignUpScreen.route) {
             SignUpScreen(
                 onNavigateToLogin = {
                     navController.navigate(Screen.LoginScreen.route) {
@@ -81,7 +85,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
             )
         }
 
-        composable(Screen.LoginScreen.route){
+        composable(Screen.LoginScreen.route) {
             LoginScreen(
                 onNavigateToSignUp = { navController.navigate(Screen.SignUpScreen.route) },
                 onSignInSuccess = {
@@ -98,8 +102,8 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
 
         }
 
-        composable(Screen.HomeScreen.route){
-            HomeScreen(
+        composable(Screen.HomeScreen.route) {
+            HomeScreen(navController = navController,
                 onPostClick = { post ->
                     navController.navigate("post_details_screen/${post.id}")
                 },
@@ -122,8 +126,11 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                         }
                     }
                 }
+
+
             )
         }
+    
 
         composable(Screen.PostScreen.route){
             PostScreen(
@@ -156,5 +163,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                 }
             }
         }
+        composable(Screen.Profile.route) {  }
+        composable(Screen.Event.route){ }
     }
 }

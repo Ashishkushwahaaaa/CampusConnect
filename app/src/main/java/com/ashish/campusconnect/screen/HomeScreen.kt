@@ -9,6 +9,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -48,10 +50,15 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
+fun HomeScreen( navController: NavHostController,
     onPostClick: (Post) -> Unit,
     onCreatePostClick: () -> Unit,
     onGuestLogin: () -> Unit,
@@ -64,6 +71,10 @@ fun HomeScreen(
     val isGuest by sessionManager.isGuest.collectAsState(initial = false)
     var showLogoutDialog by remember{mutableStateOf(false)}
     val upvotedPosts by viewModel.upvotedPostIds.collectAsState()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+
 
     LaunchedEffect(true) {
         viewModel.refreshPosts()
@@ -91,12 +102,19 @@ fun HomeScreen(
             }
         )
     }
+    data class BottomNavItem(
+        val title: String,
+        val icon: ImageVector,
+        val route: String
+    )
 
     val navItems = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Profile,
-        BottomNavItem.Event
+        BottomNavItem("Home", Icons.Default.Home, Screen.HomeScreen.route),
+        BottomNavItem("Events", Icons.Default.DateRange, Screen.Event.route), // or create an EventScreen
+        BottomNavItem("Profile", Icons.Default.AccountCircle, Screen.Profile.route)
     )
+
+
     var selectedItem by remember { mutableStateOf(0) }
 
     Scaffold(
@@ -130,24 +148,32 @@ fun HomeScreen(
                     )
                 }
             }
-        }git
+        },
 
-            NavigationBar {
-                navItems.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) },
-                        selected = selectedItem == index,
-                        onClick = {
-                            selectedItem = index
-                            // Handle navigation based on item.route
-                            // e.g. navController.navigate(item.route)
-                        }
-                    )
+
+            bottomBar = {
+                NavigationBar {
+                    navItems.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            icon = { Icon(item.icon, contentDescription = item.title) },
+                            label = { Text(item.title) },
+                            selected = selectedItem == index,
+                            onClick = {
+                                selectedItem = index
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+
+                            }
+                        )
+                    }
                 }
+
             }
-
-
 
     ) { padding ->
 
