@@ -175,7 +175,9 @@ fun HomeScreen( navController: NavHostController,
 
             }
 
-    ) { padding ->
+    )
+
+    { padding ->
 
         LazyColumn(
             modifier = Modifier

@@ -64,7 +64,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
         composable(Screen.SignUpScreen.route) {
             SignUpScreen(
                 onNavigateToLogin = {
-                    navController.navigate(Screen.LoginScreen.route) {
+ git                    navController.navigate(Screen.LoginScreen.route) {
                         popUpTo(Screen.SignUpScreen.route) { inclusive = true }
                     }
                 },
