@@ -7,7 +7,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -48,7 +50,8 @@ fun MainScreen(
     val navItems = listOf(
         BottomNavItem("Home", Icons.Default.Home, "main_home"),
         BottomNavItem("Events", Icons.Default.DateRange, "main_events"),
-        BottomNavItem("Profile", Icons.Default.AccountCircle, "main_profile")
+        BottomNavItem("Profile", Icons.Default.AccountCircle, "main_profile"),
+        BottomNavItem("courses", Icons.Default.Favorite, "main_courses")
     )
 
 

@@ -34,11 +34,15 @@ fun BottomNavGraph(
         }
 
         composable("main_events") {
-            event()
+            Event_screen()
         }
 
         composable("main_profile") {
-            profile()
+            ProfileScreen()
+        }
+
+        composable("main_courses"){
+            CoursesScreen()
         }
     }
 }

@@ -16,5 +16,6 @@ sealed class Screen (val route: String){
     object CampusIdVerificationScreen: Screen("campus_id_verification_screen")
     object Profile : Screen("profile_screen")
     object Event : Screen("event_screen")
+    object courses : Screen("courses_screen")
 }
 
