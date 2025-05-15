@@ -23,6 +23,11 @@ fun BottomNavGraph(
         startDestination = "main_home"
     ) {
         composable("main_home") {
+            homescreen()
+        }
+
+        composable("main_events") {
+            //Event_screen()
             HomeScreen(
                 navController = navController,
                 onPostClick = onPostClick,
@@ -33,16 +38,12 @@ fun BottomNavGraph(
             )
         }
 
-        composable("main_events") {
-            Event_screen()
-        }
-
         composable("main_profile") {
             ProfileScreen()
         }
 
         composable("main_courses"){
-            CoursesScreen()
+            courses()
         }
     }
 }

@@ -82,22 +82,23 @@ fun ProfileScreen(
 
 
 @Composable
-fun profile() {
+fun courses() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("profile", style = MaterialTheme.typography.headlineLarge)
+        Text("Courses", style = MaterialTheme.typography.headlineLarge)
     }
 
 }
 @Composable
-fun event() {
+fun homescreen() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("event", style = MaterialTheme.typography.headlineLarge)
+        Text("Home", style = MaterialTheme.typography.headlineLarge)
     }
 
 }
+
