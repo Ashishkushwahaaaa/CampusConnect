@@ -161,11 +161,7 @@ fun HomeScreen( navController: NavHostController,
                             onClick = {
                                 selectedItem = index
                                 navController.navigate(item.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
+
                                 }
 
                             }

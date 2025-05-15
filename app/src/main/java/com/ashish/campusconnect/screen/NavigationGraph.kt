@@ -163,7 +163,11 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                 }
             }
         }
-        composable(Screen.Profile.route) {  }
-        composable(Screen.Event.route){ }
+        composable(Screen.Profile.route) {
+            profile()
+        }
+        composable(Screen.Event.route){
+            event()
+        }
     }
 }

@@ -9,12 +9,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun profile(onNavigate: () -> Unit) {
+fun profile() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text("profile", style = MaterialTheme.typography.headlineLarge)
+    }
+
+}
+@Composable
+fun event() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("event", style = MaterialTheme.typography.headlineLarge)
     }
 
 }
