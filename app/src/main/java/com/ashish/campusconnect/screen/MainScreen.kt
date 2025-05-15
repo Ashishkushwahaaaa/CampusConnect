@@ -46,10 +46,11 @@ fun MainScreen(
     )
 
     val navItems = listOf(
-        BottomNavItem("Home", Icons.Default.Home,Screen.HomeScreen.route),
-        BottomNavItem("Events", Icons.Default.DateRange,Screen.Event.route),
-        BottomNavItem("Profile", Icons.Default.AccountCircle,Screen.Profile.route)
+        BottomNavItem("Home", Icons.Default.Home, "main_home"),
+        BottomNavItem("Events", Icons.Default.DateRange, "main_events"),
+        BottomNavItem("Profile", Icons.Default.AccountCircle, "main_profile")
     )
+
 
 
     Scaffold(

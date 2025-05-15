@@ -18,8 +18,11 @@ fun BottomNavGraph(
     onCreatePostClick: () -> Unit,
     onGuestLogin: () -> Unit
 ) {
-    NavHost(navController, startDestination = BottomNavItem.Home.route) {
-        composable(BottomNavItem.Home.route) {
+    NavHost(
+        navController = navController,
+        startDestination = "main_home"
+    ) {
+        composable("main_home") {
             HomeScreen(
                 navController = navController,
                 onPostClick = onPostClick,
@@ -29,22 +32,12 @@ fun BottomNavGraph(
                 padding = padding
             )
         }
-        /*composable("main_home") {
-            HomeScreen(
-                navController = navController,
-                onPostClick = onPostClick,
-                onCreatePostClick = onCreatePostClick,
-                onGuestLogin = onGuestLogin,
-                onUserLogout = onLogout,
-                padding = padding
-            )
-        }*/
 
-        composable(Screen.Event.route) {
+        composable("main_events") {
             event()
         }
 
-        composable(Screen.Profile.route) {
+        composable("main_profile") {
             profile()
         }
     }
