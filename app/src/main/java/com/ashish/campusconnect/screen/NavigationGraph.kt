@@ -103,7 +103,8 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
         }
 
         composable(Screen.HomeScreen.route) {
-            HomeScreen(navController = navController,
+            MainScreen(
+                navController = navController,
                 onPostClick = { post ->
                     navController.navigate("post_details_screen/${post.id}")
                 },
@@ -118,19 +119,18 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                 },
                 onUserLogout = {
                     coroutineScope.launch {
-                        sessionManager.setGuestMode(true) // switching to GuestMode, you can set it as false to behave as new user
+                        sessionManager.setGuestMode(true)
                         FirebaseAuth.getInstance().signOut()
-
                         navController.navigate(Screen.LoginScreen.route) {
                             popUpTo(Screen.HomeScreen.route) { inclusive = true }
                         }
                     }
-                }
-
-
+                },
+                sessionManager = sessionManager,
             )
         }
-    
+
+
 
         composable(Screen.PostScreen.route){
             PostScreen(
@@ -163,11 +163,6 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                 }
             }
         }
-        composable(Screen.Profile.route) {
-            profile()
-        }
-        composable(Screen.Event.route){
-            event()
-        }
+
     }
 }
