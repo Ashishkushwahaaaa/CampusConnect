@@ -135,7 +135,8 @@ fun HomeScreen(
                     post = post,
                     onClick = { onPostClick(post) },
                     upvotedPosts = upvotedPosts,
-                    onUpvoteClick = { viewModel.toggleUpvote(it) }
+                    onUpvoteClick = { viewModel.toggleUpvote(it) },
+                    isGuest = isGuest
                 )
             }
         }
@@ -157,7 +158,8 @@ fun PostItem(
     post: Post,
     onClick: () -> Unit,
     upvotedPosts: Set<String>,
-    onUpvoteClick: (Post) -> Unit
+    onUpvoteClick: (Post) -> Unit,
+    isGuest: Boolean
 ) {
     val auth = remember { FirebaseAuth.getInstance() }
     val user = auth.currentUser
@@ -225,7 +227,7 @@ fun PostItem(
             ) {
                 IconButton(
                     onClick = {
-                        if (user == null) {
+                        if (user == null || isGuest) {
                             Toast.makeText(context, "Login to upvote", Toast.LENGTH_SHORT).show()
                         } else {
                             localUpvotes += if (hasUpvoted) -1 else 1
