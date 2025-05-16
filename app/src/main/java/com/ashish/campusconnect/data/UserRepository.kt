@@ -39,10 +39,6 @@ class UserRepository(
 
             tempFirebaseUser = user
             user.sendEmailVerification().await()
-
-            firestore.collection("incompleteSignups").document(user.uid)
-                .set(mapOf("email" to email, "createdAt" to FieldValue.serverTimestamp())).await()
-
             Result.Success(true)
         } catch (e: Exception) {
             Result.Error(e)
@@ -91,9 +87,6 @@ class UserRepository(
             val campusIdDoc = firestore.collection("campus_ids").document(role)
             val fieldPath = FieldPath.of("ids", campusId)
             campusIdDoc.update(fieldPath, true).await()
-
-            // 🔹 Delete incomplete signup flag
-            firestore.collection("incompleteSignups").document(user.uid).delete().await()
 
             Result.Success(true)
         } catch (e: Exception) {

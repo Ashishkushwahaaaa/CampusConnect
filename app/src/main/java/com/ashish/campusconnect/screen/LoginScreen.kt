@@ -1,35 +1,17 @@
 package com.ashish.campusconnect.screen
 
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,125 +22,82 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ashish.campusconnect.viewmodel.AuthViewModel
 import com.ashish.campusconnect.data.Result
 import com.ashish.campusconnect.data.SessionManager
-import com.ashish.campusconnect.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(
-    authViewModel: AuthViewModel = viewModel(),
-    onNavigateToSignUp: ()-> Unit,
-    onSignInSuccess: () -> Unit,
-    onGuestContinue: () -> Unit
-){
+fun LoginScreen(authViewModel: AuthViewModel = viewModel(),onNavigateToSignUp: ()-> Unit,onSignInSuccess: () -> Unit, onNavigateToHome: () -> Unit){
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
     val authResult by authViewModel.authResult.observeAsState()
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
     val coroutineScope = rememberCoroutineScope()
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        WavyTopBar(
-            selectedScreen = AuthScreen.SIGN_IN,
-            onSignInClick = {}, // Already on this screen
-            onSignUpClick = { onNavigateToSignUp() }
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Button(onClick = {
+            //Add navigation to home screen to see only posts
+            coroutineScope.launch {
+                sessionManager.setGuestMode(true)
+                // Navigate to Home Screen
+                onNavigateToHome()
+            }
+
+        }){
+            Text("Continue as Guest")
+        }
+        OutlinedTextField(
+            value = email,
+            onValueChange = {email = it},
+            label = {Text("Email")},
+            modifier = Modifier.fillMaxWidth().padding(8.dp)
         )
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-                .imePadding()
-                .background(colorScheme.background),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(onClick = {
-                    coroutineScope.launch {
-                        sessionManager.setGuestMode(true)
-                        // Navigate to Home Screen
-                        onGuestContinue()
-                    }
-                }) {
-                    Text("Continue as Guest", color = colorScheme.primary, style = Typography.bodyLarge)
-                }
-            }
-            Card(
-                modifier = Modifier.wrapContentHeight().fillMaxWidth(),
-                border = BorderStroke(1.dp, color = colorScheme.primary)
-            ) {
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Email*") },
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    singleLine = true,
-                    leadingIcon = {Icon(imageVector = Icons.Default.Email, contentDescription = "Email")}
-                )
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password*") },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                    trailingIcon = {
-                        val visibilityIcon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                        val description = if (passwordVisible) "Hide password" else "Show password"
 
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(imageVector = visibilityIcon, contentDescription = description)
-                        }
-                    }
-                )
-                Button(
-                    onClick = { authViewModel.login(email, password) },
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
-                    shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp),
-//                    enabled = if(email.isNotBlank() && password.isNotBlank()) true else false
-                ) { Text(text = "Login") }
-            }
-            Text(
-                text = "Don't have an account? Sign Up.",
-                color = Color.Blue,
-                modifier = Modifier.padding(16.dp).clickable { onNavigateToSignUp() }
-            )
+        OutlinedTextField(
+            value = password,
+            onValueChange = {password = it},
+            label = {Text("Password")},
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            visualTransformation = PasswordVisualTransformation()
+        )
 
-            authResult?.let { result ->
-                LaunchedEffect(result) {
-                    when (result) {
-                        is Result.Success -> {
-                            Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
-                            coroutineScope.launch {
-                                sessionManager.setLoggedInUser()
-                            }
-                            onSignInSuccess()
+        Button(
+            onClick = { authViewModel.login(email, password) },
+            modifier = Modifier.fillMaxWidth().padding(8.dp)
+        ) {Text(text = "Login") }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(text = "Don't have an Account? Sign Up", modifier = Modifier.clickable{
+            // Navigate to SignUp Screen
+            onNavigateToSignUp()
+        })
+
+        authResult?.let { result ->
+            LaunchedEffect(result) {
+                when (result) {
+                    is Result.Success -> {
+                        Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+                        coroutineScope.launch {
+                            sessionManager.setLoggedInUser()
                         }
-                        is Result.Error -> {
-                            if(email.isBlank() || password.isBlank()){
-                                Toast.makeText(context,"Please fill all the mandatory fields", Toast.LENGTH_SHORT).show()
-                            }else{
-                                Toast.makeText(context,"Login Failed: ${result.exception.message}",Toast.LENGTH_LONG).show()
-                            }
-                        }
+                        onSignInSuccess()
+                    }
+                    is Result.Error -> {
+                        Toast.makeText(context,"Login Failed: ${result.exception.message}",Toast.LENGTH_LONG).show()
                     }
                 }
             }
         }
+
     }
 }

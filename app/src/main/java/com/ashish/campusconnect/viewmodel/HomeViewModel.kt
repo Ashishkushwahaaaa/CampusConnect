@@ -37,9 +37,9 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun fetchUserUpvotedPosts() {
-        val userEmail = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.email ?: return
+        val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: return
         firestore.collection("posts")
-            .whereEqualTo("upvotedBy.${userEmail.substringBefore("@")}", true)
+            .whereEqualTo("upvotedBy.$uid", true)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) return@addSnapshotListener
                 val upvotedIds = snapshot?.documents?.mapNotNull { it.id }?.toSet() ?: emptySet()
@@ -48,7 +48,7 @@ class HomeViewModel : ViewModel() {
     }
 
     fun toggleUpvote(post: Post) {
-        val userEmail = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.email ?: return
+        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser ?: return
         val postRef = firestore.collection("posts").document(post.id)
         val isCurrentlyUpvoted = _upvotedPostIds.value.contains(post.id)
 
@@ -57,7 +57,7 @@ class HomeViewModel : ViewModel() {
             postRef.update(
                 mapOf(
                     "upvotes" to com.google.firebase.firestore.FieldValue.increment(-1),
-                    "upvotedBy.${userEmail.substringBefore("@")}" to com.google.firebase.firestore.FieldValue.delete()
+                    "upvotedBy.${user.uid}" to com.google.firebase.firestore.FieldValue.delete()
                 )
             )
             _upvotedPostIds.value = _upvotedPostIds.value - post.id
@@ -66,7 +66,7 @@ class HomeViewModel : ViewModel() {
             postRef.update(
                 mapOf(
                     "upvotes" to com.google.firebase.firestore.FieldValue.increment(1),
-                    "upvotedBy.${userEmail.substringBefore("@")}" to true
+                    "upvotedBy.${user.uid}" to true
                 )
             )
             _upvotedPostIds.value = _upvotedPostIds.value + post.id

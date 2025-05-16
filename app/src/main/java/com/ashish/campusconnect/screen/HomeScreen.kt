@@ -7,22 +7,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,14 +41,21 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
-    onPostClick: (Post) -> Unit,
-    onCreatePostClick: () -> Unit,
-    onGuestLogin: () -> Unit,
-    onUserLogout:()->Unit
+fun HomeScreen(navController: NavHostController,
+               onPostClick: (Post) -> Unit,
+               onCreatePostClick: () -> Unit,
+               onGuestLogin: () -> Unit,
+               onUserLogout:()->Unit,
+               padding: PaddingValues
+
+
+
 ) {
     val viewModel: HomeViewModel = viewModel()
     val posts by viewModel.posts.collectAsState()
@@ -62,6 +64,10 @@ fun HomeScreen(
     val isGuest by sessionManager.isGuest.collectAsState(initial = false)
     var showLogoutDialog by remember{mutableStateOf(false)}
     val upvotedPosts by viewModel.upvotedPostIds.collectAsState()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+
 
     LaunchedEffect(true) {
         viewModel.refreshPosts()
@@ -90,40 +96,8 @@ fun HomeScreen(
         )
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Campus Connect", fontWeight = FontWeight.ExtraBold)},
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorResource(id = R.color.top_bar_color),
-                    titleContentColor = colorResource(id = R.color.black)
-                ),
-                actions = {
-                    if (isGuest){
-                        IconButton(onClick = { onGuestLogin() }) {
-                            Icon(Icons.Default.AccountCircle, contentDescription = "Login")
-                        }
-                    }else{
-                        IconButton(onClick = {showLogoutDialog = true}) {
-                            Icon(Icons.Default.AccountCircle, contentDescription = "Logout")
-                        }
-                    }
-                }
-            )
-        },
-        containerColor = colorResource(id = R.color.background_container_color_2),
-        floatingActionButton =  {
-            if(!isGuest){
-                FloatingActionButton(onClick = onCreatePostClick) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Create Post"
-                    )
-                }
-            }
-        }
-    ) { padding ->
 
+    Scaffold {padding ->
         LazyColumn(
             modifier = Modifier
                 .padding(padding)
@@ -135,12 +109,12 @@ fun HomeScreen(
                     post = post,
                     onClick = { onPostClick(post) },
                     upvotedPosts = upvotedPosts,
-                    onUpvoteClick = { viewModel.toggleUpvote(it) },
-                    isGuest = isGuest
+                    onUpvoteClick = { viewModel.toggleUpvote(it) }
                 )
             }
         }
     }
+
 }
 
 //format time and date
@@ -158,8 +132,7 @@ fun PostItem(
     post: Post,
     onClick: () -> Unit,
     upvotedPosts: Set<String>,
-    onUpvoteClick: (Post) -> Unit,
-    isGuest: Boolean
+    onUpvoteClick: (Post) -> Unit
 ) {
     val auth = remember { FirebaseAuth.getInstance() }
     val user = auth.currentUser
@@ -227,7 +200,7 @@ fun PostItem(
             ) {
                 IconButton(
                     onClick = {
-                        if (user == null || isGuest) {
+                        if (user == null) {
                             Toast.makeText(context, "Login to upvote", Toast.LENGTH_SHORT).show()
                         } else {
                             localUpvotes += if (hasUpvoted) -1 else 1
@@ -248,4 +221,16 @@ fun PostItem(
             }
         }
     }
+
+}
+
+@Composable
+fun homescreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Home", style = MaterialTheme.typography.headlineLarge)
+    }
+
 }
