@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class AuthViewModel: ViewModel() {
     private val userRepository = UserRepository(
@@ -70,6 +71,7 @@ class AuthViewModel: ViewModel() {
 
     fun onEmailChanged() {
 //        FirebaseAuth.getInstance().currentUser?.delete()
+        // 🔹 Delete incomplete signup flag
         _emailVerified.value = null
         _emailVerificationSent.value = null
         _isPollingCompleted.value = false

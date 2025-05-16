@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -169,7 +170,7 @@ fun PostScreen(onPostUploaded: () -> Unit) {
                             Toast.makeText(context, "No app to view PDF", Toast.LENGTH_SHORT).show()
                         }
                     }) {
-                        Icon(Icons.Default.ArrowForward, contentDescription = "Preview PDF")
+                        Icon(Icons.Default.Visibility, contentDescription = "Preview PDF")
 
                     }
                     IconButton(

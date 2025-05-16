@@ -18,11 +18,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ashish.campusconnect.data.SessionManager
 import com.ashish.campusconnect.viewmodel.PostDetailsViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun NavigationGraph(modifier: Modifier, navController: NavHostController){
@@ -32,28 +33,51 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
     val isGuest by sessionManager.isGuest.collectAsState(initial = null)
     val coroutineScope = rememberCoroutineScope()
     val currentUser = FirebaseAuth.getInstance().currentUser
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
 
+    NavHost(navController = navController, startDestination = Screen.SplashScreen.route){
 
-    NavHost(navController = navController, startDestination = Screen.SplashScreen.route) {
-
-        composable(Screen.SplashScreen.route) {
+        composable(Screen.SplashScreen.route){
             if (isGuest != null) {
                 SplashScreen(onNavigate = {
-                    if (isGuest == true) {
-                        navController.navigate(Screen.HomeScreen.route) {
-                            popUpTo(Screen.SplashScreen.route) { inclusive = true }
-                        }
-                    } else if (currentUser != null) {
-                        // Logged in and not guest → go to Home
-                        navController.navigate(Screen.HomeScreen.route) {
-                            popUpTo(Screen.SplashScreen.route) { inclusive = true }
-                        }
-                    } else {
-                        // Not guest, but not logged in → go to Login
-                        navController.navigate(Screen.SignUpScreen.route) {
-                            popUpTo(Screen.SplashScreen.route) { inclusive = true }
+                    coroutineScope.launch {
+                        if (isGuest == true) {
+                            navController.navigate(Screen.HomeScreen.route) {
+                                popUpTo(Screen.SplashScreen.route) { inclusive = true }
+                            }
+                        } else if (currentUser != null) {
+                            currentUser.reload().await()
+
+                            val uid = currentUser.uid
+                            val snapshot = FirebaseFirestore.getInstance()
+                                .collection("incompleteSignups")
+                                .document(uid)
+                                .get()
+                                .await()
+
+                            if (snapshot.exists()) {
+                                // Incomplete user, delete account and navigate to SignUp
+                                FirebaseAuth.getInstance().currentUser?.delete()
+                                FirebaseFirestore.getInstance().collection("incompleteSignups")
+                                    .document(uid).delete()
+
+                                navController.navigate(Screen.SignUpScreen.route) {
+                                    popUpTo(Screen.SplashScreen.route) { inclusive = true }
+                                }
+                            } else if (currentUser.isEmailVerified) {
+                                // Fully registered user
+                                navController.navigate(Screen.HomeScreen.route) {
+                                    popUpTo(Screen.SplashScreen.route) { inclusive = true }
+                                }
+                            } else {
+                                // Not verified, not incomplete — ask to register
+                                navController.navigate(Screen.SignUpScreen.route) {
+                                    popUpTo(Screen.SplashScreen.route) { inclusive = true }
+                                }
+                            }
+                        } else {
+                            navController.navigate(Screen.SignUpScreen.route) {
+                                popUpTo(Screen.SplashScreen.route) { inclusive = true }
+                            }
                         }
                     }
                 })
@@ -61,7 +85,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                 SplashScreen(onNavigate = {})
             }
         }
-        composable(Screen.SignUpScreen.route) {
+        composable(Screen.SignUpScreen.route){
             SignUpScreen(
                 onNavigateToLogin = {
                     navController.navigate(Screen.LoginScreen.route) {
@@ -73,8 +97,27 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                         //Here i am not using popUpTo() because it was creating confusion as the
                         // first screen was LoginScreen and also the current screen was login and
                         // hence functionality was not as expectedly working.So manually popped up last two screen from the stack
-                        navController.popBackStack()
-                        navController.popBackStack()
+//                        navController.popBackStack()
+//                        navController.popBackStack()
+                        popUpTo(Screen.SignUpScreen.route){inclusive = true}
+                    }
+                },
+                onGuestContinue = {
+                    navController.navigate(Screen.HomeScreen.route) {
+                        popUpTo(Screen.SignUpScreen.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(Screen.LoginScreen.route){
+            LoginScreen(
+                onNavigateToSignUp = { navController.navigate(Screen.SignUpScreen.route){
+                    popUpTo(Screen.LoginScreen.route){inclusive = true}
+                } },
+                onSignInSuccess = {
+                    navController.navigate(Screen.HomeScreen.route) {
+                        popUpTo(Screen.LoginScreen.route) { inclusive = true }
                     }
                 },
                 onGuestContinue = {
@@ -83,28 +126,11 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                     }
                 }
             )
-        }
-
-        composable(Screen.LoginScreen.route) {
-            LoginScreen(
-                onNavigateToSignUp = { navController.navigate(Screen.SignUpScreen.route) },
-                onSignInSuccess = {
-                    navController.navigate(Screen.HomeScreen.route) {
-                        popUpTo(Screen.LoginScreen.route) { inclusive = true }
-                    }
-                },
-                onNavigateToHome = {
-                    navController.navigate(Screen.HomeScreen.route) {
-                        popUpTo(Screen.LoginScreen.route) { inclusive = true }
-                    }
-                }
-            )
 
         }
 
-        composable(Screen.HomeScreen.route) {
-            MainScreen(
-                navController = navController,
+        composable(Screen.HomeScreen.route){
+            HomeScreen(
                 onPostClick = { post ->
                     navController.navigate("post_details_screen/${post.id}")
                 },
@@ -119,22 +145,21 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                 },
                 onUserLogout = {
                     coroutineScope.launch {
-                        sessionManager.setGuestMode(true)
+                        sessionManager.setGuestMode(false) // switching to GuestMode, you can set it as false to behave as new user
                         FirebaseAuth.getInstance().signOut()
                         navController.navigate(Screen.LoginScreen.route) {
                             popUpTo(Screen.HomeScreen.route) { inclusive = true }
                         }
                     }
-                },
-                sessionManager = sessionManager,
+                }
             )
         }
 
-
-
         composable(Screen.PostScreen.route){
             PostScreen(
-                onPostUploaded = { navController.navigate(Screen.HomeScreen.route) }
+                onPostUploaded = { navController.navigate(Screen.HomeScreen.route){
+                    popUpTo(Screen.PostScreen.route){inclusive = true}
+                } }
             )
         }
 
@@ -163,6 +188,5 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                 }
             }
         }
-
     }
 }
