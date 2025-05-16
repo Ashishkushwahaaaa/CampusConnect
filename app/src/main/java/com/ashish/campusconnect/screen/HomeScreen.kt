@@ -221,4 +221,16 @@ fun PostItem(
             }
         }
     }
+
+}
+
+@Composable
+fun homescreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Home", style = MaterialTheme.typography.headlineLarge)
+    }
+
 }

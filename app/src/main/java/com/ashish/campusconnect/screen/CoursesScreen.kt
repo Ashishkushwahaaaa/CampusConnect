@@ -99,3 +99,14 @@ fun CourseCard(course: Course) {
         }
     }
 }
+
+@Composable
+fun courses() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Courses", style = MaterialTheme.typography.headlineLarge)
+    }
+
+}
