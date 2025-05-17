@@ -18,6 +18,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -111,7 +112,7 @@ fun HomeScreen(
                 }
             )
         },
-        containerColor = colorResource(id = R.color.background_container_color_2),
+        containerColor = colorScheme.background,
         floatingActionButton =  {
             if(!isGuest){
                 FloatingActionButton(onClick = onCreatePostClick) {
@@ -173,7 +174,7 @@ fun PostItem(
             .fillMaxWidth()
             .padding(vertical = 10.dp)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.white)),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(4.dp)) {

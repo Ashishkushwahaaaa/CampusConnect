@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -47,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
@@ -59,6 +61,8 @@ import com.ashish.campusconnect.data.SessionManager
 import com.ashish.campusconnect.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 import com.ashish.campusconnect.data.Result
+import com.ashish.campusconnect.ui.theme.AppThemeColor
+import com.ashish.campusconnect.ui.theme.Pink40
 import com.ashish.campusconnect.ui.theme.Typography
 
 @Composable
@@ -140,7 +144,9 @@ fun SignUpScreen(
             }
             Card(
                 modifier = Modifier.wrapContentHeight().fillMaxWidth(),
-                border = BorderStroke(1.dp, color = colorScheme.primary)
+                border = BorderStroke(1.dp, color = colorScheme.primary),
+//                shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
+//                colors = androidx.compose.material3.CardDefaults.cardColors(Color(AppThemeColor.red, AppThemeColor.green, AppThemeColor.blue, alpha = 0.5f))
             ) {
                 OutlinedTextField(
                     value = campusId,
@@ -194,6 +200,7 @@ fun SignUpScreen(
                                 pressedElevation = 8.dp,
                                 disabledElevation = 0.dp
                             ),
+                            colors = ButtonDefaults.buttonColors(colorScheme.primary)
                         ) {
                             Text(role.replaceFirstChar { it.uppercase() })
                         }
