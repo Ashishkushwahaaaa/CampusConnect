@@ -40,7 +40,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.ashish.campusconnect.R
 import com.ashish.campusconnect.data.Post
-import com.ashish.campusconnect.viewmodel.HomeViewModel
+import com.ashish.campusconnect.viewmodel.UpdateViewModel
 import com.ashish.campusconnect.data.SessionManager
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
@@ -50,13 +50,13 @@ import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
+fun UpdateScreen(
     onPostClick: (Post) -> Unit,
     onCreatePostClick: () -> Unit,
     onGuestLogin: () -> Unit,
     onUserLogout:()->Unit
 ) {
-    val viewModel: HomeViewModel = viewModel()
+    val viewModel: UpdateViewModel = viewModel()
     val posts by viewModel.posts.collectAsState()
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import com.google.firebase.firestore.ListenerRegistration
 
-class HomeViewModel : ViewModel() {
+class UpdateViewModel : ViewModel() {
 
     private val firestore = FirebaseFirestore.getInstance()
 

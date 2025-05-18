@@ -41,7 +41,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                 SplashScreen(onNavigate = {
                     coroutineScope.launch {
                         if (isGuest == true) {
-                            navController.navigate(Screen.HomeScreen.route) {
+                            navController.navigate(Screen.UpdateScreen.route) {
                                 popUpTo(Screen.SplashScreen.route) { inclusive = true }
                             }
                         } else if (currentUser != null) {
@@ -65,7 +65,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                                 }
                             } else if (currentUser.isEmailVerified) {
                                 // Fully registered user
-                                navController.navigate(Screen.HomeScreen.route) {
+                                navController.navigate(Screen.UpdateScreen.route) {
                                     popUpTo(Screen.SplashScreen.route) { inclusive = true }
                                 }
                             } else {
@@ -103,7 +103,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                     }
                 },
                 onGuestContinue = {
-                    navController.navigate(Screen.HomeScreen.route) {
+                    navController.navigate(Screen.UpdateScreen.route) {
                         popUpTo(Screen.SignUpScreen.route) { inclusive = true }
                     }
                 }
@@ -116,12 +116,12 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                     popUpTo(Screen.LoginScreen.route){inclusive = true}
                 } },
                 onSignInSuccess = {
-                    navController.navigate(Screen.HomeScreen.route) {
+                    navController.navigate(Screen.UpdateScreen.route) {
                         popUpTo(Screen.LoginScreen.route) { inclusive = true }
                     }
                 },
                 onGuestContinue = {
-                    navController.navigate(Screen.HomeScreen.route) {
+                    navController.navigate(Screen.UpdateScreen.route) {
                         popUpTo(Screen.LoginScreen.route) { inclusive = true }
                     }
                 }
@@ -129,8 +129,8 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
 
         }
 
-        composable(Screen.HomeScreen.route){
-            HomeScreen(
+        composable(Screen.UpdateScreen.route){
+            UpdateScreen(
                 onPostClick = { post ->
                     navController.navigate("post_details_screen/${post.id}")
                 },
@@ -139,7 +139,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                     coroutineScope.launch {
                         sessionManager.setGuestMode(false)
                         navController.navigate(Screen.LoginScreen.route) {
-                            popUpTo(Screen.HomeScreen.route) { inclusive = true }
+                            popUpTo(Screen.UpdateScreen.route) { inclusive = true }
                         }
                     }
                 },
@@ -148,7 +148,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
                         sessionManager.setGuestMode(false) // switching to GuestMode, you can set it as false to behave as new user
                         FirebaseAuth.getInstance().signOut()
                         navController.navigate(Screen.LoginScreen.route) {
-                            popUpTo(Screen.HomeScreen.route) { inclusive = true }
+                            popUpTo(Screen.UpdateScreen.route) { inclusive = true }
                         }
                     }
                 }
@@ -157,7 +157,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
 
         composable(Screen.PostScreen.route){
             PostScreen(
-                onPostUploaded = { navController.navigate(Screen.HomeScreen.route){
+                onPostUploaded = { navController.navigate(Screen.UpdateScreen.route){
                     popUpTo(Screen.PostScreen.route){inclusive = true}
                 } }
             )
