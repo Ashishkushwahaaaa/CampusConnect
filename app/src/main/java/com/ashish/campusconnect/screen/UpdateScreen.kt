@@ -67,68 +67,9 @@ fun UpdateScreen(
     LaunchedEffect(true) {
         viewModel.refreshPosts()
     }
-
-    if (showLogoutDialog) {
-        AlertDialog(
-            onDismissRequest = { showLogoutDialog = false },
-            title = { Text("Logout") },
-            text = { Text("Are you sure you want to logout?") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showLogoutDialog = false
-                        onUserLogout()
-                    }
-                ) {
-                    Text("Yes")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showLogoutDialog = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Campus Connect", fontWeight = FontWeight.ExtraBold)},
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorResource(id = R.color.top_bar_color),
-                    titleContentColor = colorResource(id = R.color.black)
-                ),
-                actions = {
-                    if (isGuest){
-                        IconButton(onClick = { onGuestLogin() }) {
-                            Icon(Icons.Default.AccountCircle, contentDescription = "Login")
-                        }
-                    }else{
-                        IconButton(onClick = {showLogoutDialog = true}) {
-                            Icon(Icons.Default.AccountCircle, contentDescription = "Logout")
-                        }
-                    }
-                }
-            )
-        },
-        containerColor = colorScheme.background,
-        floatingActionButton =  {
-            if(!isGuest){
-                FloatingActionButton(onClick = onCreatePostClick) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Create Post"
-                    )
-                }
-            }
-        }
-    ) { padding ->
-
         LazyColumn(
             modifier = Modifier
-                .padding(padding)
-                .padding(10.dp)
+                .padding(top = 100.dp,bottom = 80.dp)
         ) {
 
             items(posts) { post ->
@@ -142,7 +83,6 @@ fun UpdateScreen(
             }
         }
     }
-}
 
 //format time and date
 fun formatTimestamp(date: java.util.Date?): String {
@@ -172,12 +112,12 @@ fun PostItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 10.dp)
+            .padding(vertical = 4.dp, horizontal = 8.dp)
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column(modifier = Modifier.padding(4.dp)) {
+        Column(modifier = Modifier.padding(bottom = 4.dp)) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(post.thumbnailUrl)
@@ -187,6 +127,7 @@ fun PostItem(
                     .build(),
                 contentDescription = "Thumbnail",
                 contentScale = ContentScale.Crop,
+                alignment = Alignment.TopCenter,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -217,7 +158,7 @@ fun PostItem(
                     .padding(start = 4.dp, end = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = post.authorEmail, style = MaterialTheme.typography.bodySmall)
+                Text(text = post.authorEmail.substringBefore("@"), style = MaterialTheme.typography.bodySmall)
                 Text(text = formatTimestamp(post.timestamp?.toDate()), style = MaterialTheme.typography.bodySmall)
             }
             Row(

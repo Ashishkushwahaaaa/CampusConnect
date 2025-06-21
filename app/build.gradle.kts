@@ -85,5 +85,6 @@ dependencies {
     //Datastore dependency for storing data locally in the device
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-
+    implementation ("com.google.accompanist:accompanist-pager:0.31.6-rc")
+    implementation ("com.google.accompanist:accompanist-pager-indicators:0.31.6-rc")
 }

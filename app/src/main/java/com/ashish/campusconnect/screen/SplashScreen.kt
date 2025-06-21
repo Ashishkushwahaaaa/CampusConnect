@@ -81,7 +81,6 @@ fun SplashScreen(
             drawPath(
                 path = path,
                 brush = Brush.verticalGradient(
-//                    colors = listOf(Color(0xFF3F51B5), Color(0xFF2196F3))
                     colors = listOf(Color(0xFFFE4C4C), Color(0xFFFF6D6D))
                 )
             )

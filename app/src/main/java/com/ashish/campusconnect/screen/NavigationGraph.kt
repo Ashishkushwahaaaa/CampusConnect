@@ -130,7 +130,7 @@ fun NavigationGraph(modifier: Modifier, navController: NavHostController){
         }
 
         composable(Screen.UpdateScreen.route){
-            UpdateScreen(
+            MainScreen(
                 onPostClick = { post ->
                     navController.navigate("post_details_screen/${post.id}")
                 },
