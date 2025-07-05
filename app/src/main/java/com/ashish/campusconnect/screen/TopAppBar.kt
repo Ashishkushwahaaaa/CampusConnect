@@ -37,91 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 
-@Composable
-fun CampusConnectTopBar() {
-    val themeColor = Color(0xFFFF6D6D)
-    val height = 180.dp
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height)
-    ) {
-        Canvas(modifier = Modifier.matchParentSize()) {
-            val width = size.width
-            val heightPx = size.height
-
-            val waveHeight = heightPx * 0.25f
-
-            val path = Path().apply {
-                moveTo(0f, 0f)
-                lineTo(0f, heightPx - waveHeight)
-
-                quadraticBezierTo(
-                    width * 0.25f, heightPx,
-                    width * 0.5f, heightPx - waveHeight
-                )
-                quadraticBezierTo(
-                    width * 0.75f, heightPx - 2 * waveHeight,
-                    width, heightPx - waveHeight
-                )
-
-                lineTo(width, 0f)
-                close()
-            }
-
-            drawPath(path, color = themeColor)
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 40.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // CC Logo
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.3f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "CC",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // Title
-            Text(
-                text = "Campus Connect",
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
 //@Composable
-//fun CampusConnectTopBar(
-//    isGuest: Boolean,
-//    onGuestLogin: () -> Unit,
-//    onLogoutClick: () -> Unit
-//) {
+//fun CampusConnectTopBar() {
 //    val themeColor = Color(0xFFFF6D6D)
 //    val height = 180.dp
 //
@@ -133,6 +50,7 @@ fun CampusConnectTopBar() {
 //        Canvas(modifier = Modifier.matchParentSize()) {
 //            val width = size.width
 //            val heightPx = size.height
+//
 //            val waveHeight = heightPx * 0.25f
 //
 //            val path = Path().apply {
@@ -158,51 +76,127 @@ fun CampusConnectTopBar() {
 //        Row(
 //            modifier = Modifier
 //                .fillMaxWidth()
-//                .padding(start = 20.dp, top = 40.dp, end = 12.dp),
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.SpaceBetween
+//                .padding(horizontal = 20.dp, vertical = 40.dp),
+//            verticalAlignment = Alignment.CenterVertically
 //        ) {
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                // CC Logo
-//                Box(
-//                    modifier = Modifier
-//                        .size(48.dp)
-//                        .clip(CircleShape)
-//                        .background(Color.White.copy(alpha = 0.3f)),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    Text(
-//                        text = "CC",
-//                        color = Color.White,
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 18.sp
-//                    )
-//                }
-//
-//                Spacer(modifier = Modifier.width(12.dp))
-//
-//                // Title
+//            // CC Logo
+//            Box(
+//                modifier = Modifier
+//                    .size(48.dp)
+//                    .clip(CircleShape)
+//                    .background(Color.White.copy(alpha = 0.3f)),
+//                contentAlignment = Alignment.Center
+//            ) {
 //                Text(
-//                    text = "Campus Connect",
+//                    text = "CC",
 //                    color = Color.White,
-//                    fontSize = 22.sp,
-//                    fontWeight = FontWeight.Bold
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 18.sp
 //                )
 //            }
 //
-//            // Actions
-//            IconButton(onClick = {
-//                if (isGuest) onGuestLogin() else onLogoutClick()
-//            }) {
-//                Icon(
-//                    imageVector = Icons.Default.AccountCircle,
-//                    contentDescription = if (isGuest) "Login" else "Logout",
-//                    tint = Color.White
-//                )
-//            }
+//            Spacer(modifier = Modifier.width(12.dp))
+//
+//            // Title
+//            Text(
+//                text = "Campus Connect",
+//                color = Color.White,
+//                fontSize = 22.sp,
+//                fontWeight = FontWeight.Bold
+//            )
 //        }
 //    }
 //}
+
+
+
+@Composable
+fun CampusConnectTopBar(
+    isGuest: Boolean,
+    onGuestLogin: () -> Unit,
+    onLogoutClick: () -> Unit
+) {
+    val themeColor = Color(0xFFFF6D6D)
+    val height = 180.dp
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height)
+    ) {
+        Canvas(modifier = Modifier.matchParentSize()) {
+            val width = size.width
+            val heightPx = size.height
+            val waveHeight = heightPx * 0.25f
+
+            val path = Path().apply {
+                moveTo(0f, 0f)
+                lineTo(0f, heightPx - waveHeight)
+
+                quadraticBezierTo(
+                    width * 0.25f, heightPx,
+                    width * 0.5f, heightPx - waveHeight
+                )
+                quadraticBezierTo(
+                    width * 0.75f, heightPx - 2 * waveHeight,
+                    width, heightPx - waveHeight
+                )
+
+                lineTo(width, 0f)
+                close()
+            }
+
+            drawPath(path, color = themeColor)
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, top = 40.dp, end = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // CC Logo
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.3f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "CC",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                // Title
+                Text(
+                    text = "Campus Connect",
+                    color = Color.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            // Actions
+            IconButton(onClick = {
+                if (isGuest) onGuestLogin() else onLogoutClick()
+            }) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = if (isGuest) "Login" else "Logout",
+                    tint = Color.White
+                )
+            }
+        }
+    }
+}
 
 
 //****************************************************************************

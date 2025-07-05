@@ -112,7 +112,7 @@ fun SignUpScreen(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().background(colorScheme.background)) {
         WavyTopBar(
             selectedScreen = AuthScreen.SIGN_UP,
             onSignInClick = { onNavigateToLogin() },
@@ -123,7 +123,6 @@ fun SignUpScreen(
                 .verticalScroll(rememberScrollState())
                 .imePadding()
                 .padding(16.dp)
-                .background(colorScheme.background)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
@@ -135,7 +134,7 @@ fun SignUpScreen(
                 TextButton(onClick = {
                     coroutineScope.launch {
                         sessionManager.setGuestMode(true)
-                        // Navigate to Home Screen
+                        // Navigate to Main Screen
                         onGuestContinue()
                     }
                 }) {

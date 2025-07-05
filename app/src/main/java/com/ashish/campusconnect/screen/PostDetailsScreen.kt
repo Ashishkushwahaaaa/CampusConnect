@@ -23,13 +23,13 @@ import com.ashish.campusconnect.R
 import com.ashish.campusconnect.data.Post
 
 @Composable
-fun PostDetailsScreen(post: Post) {
+fun PostDetailsScreen(padding: PaddingValues, post: Post) {
     val context = LocalContext.current
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(padding)
     ) {
         item {
             if (post.thumbnailUrl.isNotEmpty()) {
@@ -48,19 +48,20 @@ fun PostDetailsScreen(post: Post) {
                             .build(),
                         contentDescription = "Image",
                         contentScale = ContentScale.FillWidth,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        alignment = Alignment.TopCenter
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            Text(text = post.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(text = post.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,modifier = Modifier.padding(start = 10.dp,end = 10.dp))
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = post.description, style = MaterialTheme.typography.bodyLarge)
+            Text(text = post.description, style = MaterialTheme.typography.bodyLarge,modifier = Modifier.padding(start = 10.dp,end = 10.dp))
             Spacer(modifier = Modifier.height(16.dp))
 
             if (post.attachmentUrls.isNotEmpty()) {
-                Text(text = "Attachments:", fontWeight = FontWeight.SemiBold)
+                Text(text = "Attachments:", fontWeight = FontWeight.SemiBold,modifier = Modifier.padding(start = 10.dp,end = 10.dp))
                 Spacer(modifier = Modifier.height(8.dp))
 
                 post.attachmentUrls.forEachIndexed { index, url ->
