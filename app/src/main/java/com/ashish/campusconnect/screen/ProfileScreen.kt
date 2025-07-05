@@ -17,60 +17,124 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
+import com.ashish.campusconnect.viewmodel.ProfileViewModel
 import com.google.firebase.auth.FirebaseAuth
+
+//@Composable
+//fun ProfileScreen(
+//    onGuestLogin: () -> Unit,
+//    onLogoutRequest: () -> Unit
+//) {
+//    val user = FirebaseAuth.getInstance().currentUser
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(24.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.Top
+//    ) {
+//        Spacer(modifier = Modifier.height(20.dp))
+//
+//        // Profile Image
+//        val photoUrl = user?.photoUrl?.toString()
+//        val painter = rememberAsyncImagePainter(photoUrl)
+//
+//        Image(
+//            painter = painter,
+//            contentDescription = "Profile Image",
+//            modifier = Modifier
+//                .size(100.dp)
+//                .padding(8.dp)
+//                .then(Modifier),
+//            contentScale = ContentScale.Crop
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        Text(
+//            text = user?.displayName ?: "Guest User",
+//            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+//        )
+//
+//        Spacer(modifier = Modifier.height(8.dp))
+//
+//        Text(
+//            text = user?.email ?: "Not Logged In",
+//            style = MaterialTheme.typography.bodyMedium,
+//            color = Color.Gray
+//        )
+//
+//        Spacer(modifier = Modifier.height(24.dp))
+//
+//        // Logout Button
+//        if (user != null) {
+//            Button(
+//                onClick =  onLogoutRequest,
+//                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+//            ) {
+//                Text(text = "Logout", color = Color.White)
+//            }
+//        } else {
+//            Text("Login to access profile features", color = Color.Gray)
+//            Button(
+//                onClick = onGuestLogin,
+//                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+//            ) {
+//                Text(text = "Login", color = Color.White)
+//            }
+//        }
+//    }
+//}
+
 
 @Composable
 fun ProfileScreen(
-    onGuestLogin: () -> Unit = {},
+    padding: PaddingValues,
+    onGuestLogin: () -> Unit,
     onLogoutRequest: () -> Unit,
+    viewModel: ProfileViewModel = viewModel()
 ) {
-    val user = FirebaseAuth.getInstance().currentUser
+    val firebaseUser = FirebaseAuth.getInstance().currentUser
+    val email = firebaseUser?.email
+
+    val userData by viewModel.user.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    LaunchedEffect(email) {
+        if (email != null) {
+            viewModel.loadUserProfile(email)
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(padding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.height(20.dp))
 
-        // Profile Image
-        val photoUrl = user?.photoUrl?.toString()
-        val painter = rememberAsyncImagePainter(photoUrl)
-
-        Image(
-            painter = painter,
-            contentDescription = "Profile Image",
-            modifier = Modifier
-                .size(100.dp)
-                .padding(8.dp)
-                .then(Modifier),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = user?.displayName ?: "Guest User",
-            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = user?.email ?: "Not Logged In",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray
-        )
+        if (userData != null) {
+            Text(text = "Name: ${userData!!.firstName} ${userData!!.lastName}")
+            Text(text = "Email: ${userData!!.email}")
+            Text(text = "Role: ${userData!!.role}")
+            Text(text = "Campus ID: ${userData!!.campusId}")
+        } else if (error != null) {
+            Text(text = "Error: $error", color = Color.Red)
+        } else {
+            if(email != null){
+                CircularProgressIndicator()
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Logout Button
-        if (user != null) {
+        if (firebaseUser != null) {
             Button(
-                onClick =  onLogoutRequest,
+                onClick = onLogoutRequest,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
                 Text(text = "Logout", color = Color.White)

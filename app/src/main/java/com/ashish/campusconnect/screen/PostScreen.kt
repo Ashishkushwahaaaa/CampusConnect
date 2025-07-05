@@ -29,7 +29,7 @@ import com.ashish.campusconnect.viewmodel.PostViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun PostScreen(onPostUploaded: () -> Unit) {
+fun PostScreen(padding:PaddingValues, onPostUploaded: () -> Unit) {
     val viewModel: PostViewModel = viewModel()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -64,8 +64,10 @@ fun PostScreen(onPostUploaded: () -> Unit) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(padding)
+            .imePadding(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
         val maxTitleChar = 150
         item {
@@ -219,5 +221,5 @@ fun PostScreen(onPostUploaded: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun PostPreview(){
-    PostScreen(onPostUploaded = {})
+    PostScreen(PaddingValues(),onPostUploaded = {})
 }

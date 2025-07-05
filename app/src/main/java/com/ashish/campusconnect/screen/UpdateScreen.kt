@@ -51,27 +51,22 @@ import androidx.compose.runtime.setValue
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateScreen(
-    onPostClick: (Post) -> Unit,
-    onCreatePostClick: () -> Unit,
-    onGuestLogin: () -> Unit,
-    onUserLogout:()->Unit
+    padding: PaddingValues,
+    onPostClick: (Post) -> Unit
 ) {
     val viewModel: UpdateViewModel = viewModel()
     val posts by viewModel.posts.collectAsState()
     val context = LocalContext.current
     val sessionManager = remember { SessionManager(context) }
     val isGuest by sessionManager.isGuest.collectAsState(initial = false)
-    var showLogoutDialog by remember{mutableStateOf(false)}
     val upvotedPosts by viewModel.upvotedPostIds.collectAsState()
 
     LaunchedEffect(true) {
         viewModel.refreshPosts()
     }
         LazyColumn(
-            modifier = Modifier
-                .padding(top = 100.dp,bottom = 80.dp)
+            modifier = Modifier.padding(padding)
         ) {
-
             items(posts) { post ->
                 PostItem(
                     post = post,

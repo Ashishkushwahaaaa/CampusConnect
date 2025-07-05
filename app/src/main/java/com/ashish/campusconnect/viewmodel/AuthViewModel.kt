@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ashish.campusconnect.data.Result
+import com.ashish.campusconnect.data.User
 import com.ashish.campusconnect.data.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -107,6 +108,15 @@ class AuthViewModel: ViewModel() {
         viewModelScope.launch {
             _authResult.value = userRepository.finalizeUserRegistration(
                 email, realPassword, firstName, lastName, role, campusId
+            )
+
+            // Creating object of user
+            val user = User(
+                email = email,
+                firstName = firstName,
+                lastName = lastName,
+                campusId = campusId,
+                role = role,
             )
         }
     }

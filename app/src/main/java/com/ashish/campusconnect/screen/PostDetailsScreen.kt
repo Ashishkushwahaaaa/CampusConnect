@@ -23,13 +23,13 @@ import com.ashish.campusconnect.R
 import com.ashish.campusconnect.data.Post
 
 @Composable
-fun PostDetailsScreen(post: Post) {
+fun PostDetailsScreen(padding: PaddingValues, post: Post) {
     val context = LocalContext.current
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 35.dp)
+            .padding(padding)
     ) {
         item {
             if (post.thumbnailUrl.isNotEmpty()) {

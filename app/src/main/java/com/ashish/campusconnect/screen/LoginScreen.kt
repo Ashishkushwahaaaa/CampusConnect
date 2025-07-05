@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -68,7 +69,11 @@ fun LoginScreen(
     val sessionManager = remember { SessionManager(context) }
     val coroutineScope = rememberCoroutineScope()
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorScheme.background)
+    ) {
         WavyTopBar(
             selectedScreen = AuthScreen.SIGN_IN,
             onSignInClick = {}, // Already on this screen
@@ -79,8 +84,7 @@ fun LoginScreen(
                 .fillMaxSize()
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
-                .imePadding()
-                .background(colorScheme.background),
+                .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -117,6 +121,7 @@ fun LoginScreen(
                     label = { Text("Password*") },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    leadingIcon = {Icon(imageVector = Icons.Default.Key, contentDescription = "Password")},
                     trailingIcon = {
                         val visibilityIcon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                         val description = if (passwordVisible) "Hide password" else "Show password"
@@ -130,7 +135,6 @@ fun LoginScreen(
                     onClick = { authViewModel.login(email, password) },
                     modifier = Modifier.fillMaxWidth().padding(8.dp),
                     shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp),
-//                    enabled = if(email.isNotBlank() && password.isNotBlank()) true else false
                 ) { Text(text = "Login") }
             }
             Text(
