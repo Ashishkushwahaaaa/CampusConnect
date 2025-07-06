@@ -35,7 +35,6 @@ fun WavyTopBar(
 ) {
     Box(
         modifier = Modifier.fillMaxWidth()
-
     ){
         Canvas(modifier = modifier.fillMaxWidth().height(150.dp)) {
             val width = size.width
@@ -87,8 +86,6 @@ fun Modifier.drawUnderline(): Modifier = this.then(
         )
     }
 )
-
-
 
 @Preview
 @Composable

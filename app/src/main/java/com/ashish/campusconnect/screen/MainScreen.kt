@@ -1,8 +1,10 @@
 package com.ashish.campusconnect.screen
 
+import android.R.attr.divider
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.hoverable
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.areStatusBarsVisible
 import androidx.compose.foundation.layout.areSystemBarsVisible
 import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,6 +33,7 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
@@ -81,6 +85,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Dp.Companion.Hairline
+import androidx.compose.ui.zIndex
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavController
 
@@ -341,53 +348,58 @@ fun BottomNavigationBar(navController: NavHostController) {
     )
     Surface (
         shadowElevation = 12.dp,
-        shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
-        modifier = Modifier
-            .border(
-                width = 2.dp,
-                color = Color(0xFFFF6D6D),
-                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
-            )
+//        shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
     ) {
-        NavigationBar(
-            containerColor = Color(0xFFFEE7E9),
-        ) {
-            val currentRoute =
-                navController.currentBackStackEntryAsState().value?.destination?.route
-            items.forEach { item ->
+        Box {
+            NavigationBar(
+                containerColor = colorScheme.background,
+            ) {
+                val currentRoute =
+                    navController.currentBackStackEntryAsState().value?.destination?.route
+                items.forEach { item ->
 
-                NavigationBarItem(
-                    selected = currentRoute == item.route,
-                    onClick = {
-                        navController.navigate(item.route) {
-                            popUpTo(Screen.Update.route) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = item.title,
-                            modifier = Modifier.size(26.dp),
-                        )
-                    },
-                    colors = NavigationBarItemDefaults.colors(
-                        indicatorColor = Color.Transparent, //indicatorColor = Color(0xFFFFCDD2),Background when selected
-                        selectedIconColor = Color(0xFFFF6D6D),
-                        unselectedIconColor = Color.Gray,
-                        selectedTextColor = Color(0xFFFF6D6D),
-                        unselectedTextColor = Color.Gray,
-                    ),
-                    label = {
-                        Text(
-                            item.title,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    },
-                )
+                    NavigationBarItem(
+                        selected = currentRoute == item.route,
+                        onClick = {
+                            navController.navigate(item.route) {
+                                popUpTo(Screen.Update.route) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = item.icon,
+                                contentDescription = item.title,
+                                modifier = Modifier.size(26.dp),
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent,
+                            selectedIconColor = Color(0xFFFF6D6D),
+                            unselectedIconColor = colorScheme.onBackground.copy(alpha = 0.7f),
+                            selectedTextColor = Color(0xFFFF6D6D),
+                            unselectedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
+                        ),
+                        label = {
+                            Text(
+                                item.title,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        },
+                    )
+                }
             }
+
+            // Divider Code After Navigation? - Drawn on the top of the Navigation Bar(child defined next in the parent is drawn on the top and then the first one is drawn below it)
+            Divider(
+                modifier = Modifier.fillMaxWidth()
+                    .align(Alignment.TopCenter)
+                    .zIndex(1f), //make sure always on the top and visible
+                color = Color(0xFFFF6D6D),
+                thickness = Hairline
+            )
         }
     }
 }
