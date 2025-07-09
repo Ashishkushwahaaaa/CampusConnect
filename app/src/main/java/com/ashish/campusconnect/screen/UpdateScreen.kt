@@ -110,7 +110,7 @@ fun PostItem(
                 .clickable { onClick() },
             colors = CardDefaults.cardColors(containerColor = colorScheme.background),
             elevation = CardDefaults.cardElevation(4.dp),
-            border = BorderStroke(Hairline, Color(0xFF9B1616))
+            border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.4f))
         ) {
             Column{
                 AsyncImage(
@@ -182,7 +182,7 @@ fun PostItem(
                 .fillMaxWidth()
                 .height(30.dp)
                 .background(
-                    color = colorScheme.inverseOnSurface.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
                     shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
                 ),
             horizontalArrangement = Arrangement.SpaceBetween,

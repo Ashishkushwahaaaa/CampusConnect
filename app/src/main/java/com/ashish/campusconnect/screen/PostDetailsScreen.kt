@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -37,7 +38,7 @@ fun PostDetailsScreen(padding: PaddingValues, post: Post) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(max = 740.dp)
-                        .background(Color.White),
+                        .background(MaterialTheme.colorScheme.background),
                     contentAlignment = Alignment.Center
                 ) {
                     AsyncImage(
@@ -54,10 +55,22 @@ fun PostDetailsScreen(padding: PaddingValues, post: Post) {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
-
-            Text(text = post.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold,modifier = Modifier.padding(start = 10.dp,end = 10.dp))
+            Text(
+                text = post.title,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(start = 10.dp,end = 10.dp)
+            )
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                thickness = 1.dp
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = post.description, style = MaterialTheme.typography.bodyLarge,modifier = Modifier.padding(start = 10.dp,end = 10.dp))
+            Text(
+                text = post.description,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 10.dp,end = 10.dp),
+                textAlign = TextAlign.Justify
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             if (post.attachmentUrls.isNotEmpty()) {

@@ -24,9 +24,12 @@ import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -129,19 +132,26 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.End
             ) {
-                TextButton(onClick = {
-                    coroutineScope.launch {
-                        sessionManager.setGuestMode(true)
-                        // Navigate to Home Screen
-                        onGuestContinue()
-                    }
-                }) {
-                    Text("Continue as Guest", color = colorScheme.primary, style = Typography.bodyLarge)
+                TextButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            sessionManager.setGuestMode(true)
+                            // Navigate to Home Screen
+                            onGuestContinue()
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text("Continue as Guest", style = Typography.bodyLarge)
                 }
             }
             Card(
                 modifier = Modifier.wrapContentHeight().fillMaxWidth(),
-                border = BorderStroke(1.dp, color = colorScheme.primary)
+                border = BorderStroke(1.dp, color = colorScheme.primary),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+
             ) {
                 OutlinedTextField(
                     value = email,
@@ -172,6 +182,10 @@ fun LoginScreen(
                     onClick = { authViewModel.login(email, password) },
                     modifier = Modifier.fillMaxWidth().padding(8.dp),
                     shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
                 ) { Text(text = "Login") }
             }
             Row(
@@ -180,7 +194,7 @@ fun LoginScreen(
             ){
                 Text(
                     text = "Forgot Password?",
-                    color = Color.Blue,
+                    color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier
                         .padding(8.dp)
                         .clickable {
@@ -194,7 +208,8 @@ fun LoginScreen(
 
             Text(
                 text = "Don't have an account? Sign Up.",
-                color = Color.Blue,
+//                color = Color.Blue,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(16.dp).clickable { onNavigateToSignUp() }
             )
 

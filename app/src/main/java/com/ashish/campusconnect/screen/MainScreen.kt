@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
@@ -52,6 +51,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp.Companion.Hairline
 import androidx.compose.ui.zIndex
 import androidx.core.view.WindowCompat
+import com.ashish.campusconnect.ui.theme.AppThemeColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,6 +70,7 @@ fun MainScreen(
     val isGuest by sessionManager.isGuest.collectAsState(initial = false)
     var showLogoutDialog by remember{mutableStateOf(false)}
     val currentRoute = screenNavController.currentBackStackEntryAsState().value?.destination?.route
+    val drawerOpenTrigger = remember { mutableStateOf(0) } //To animate the drawer logo
 
     val bottomBarRoutes = listOf(
         Screen.Home.route,
@@ -119,12 +120,19 @@ fun MainScreen(
         )
     }
 
+    LaunchedEffect(drawerState.isOpen) {
+        if (drawerState.isOpen) {
+            drawerOpenTrigger.value++ // triggers CCLogo animation
+        }
+    }
+
+
 //    SetStatusBarAppearance()
 
     ModalNavigationDrawer(
         scrimColor = Color.Black.copy(alpha = 0.5f), //The amount of blurred background when the navigation drawer is opened
         drawerContent = {
-            DrawerContent(drawerItems, screenNavController,isGuest,onGuestLogin,onUserLogout) {
+            DrawerContent(drawerItems, screenNavController,isGuest, drawerOpenTrigger.value, onGuestLogin,onUserLogout) {
                 coroutineScope.launch { drawerState.close() }
             }
         },
@@ -142,15 +150,17 @@ fun MainScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                            Text(
-                                text = currentRoute?.substringBefore("/")?: "CampusConnect",
-                                color = Color(0xFFFF6D6D),
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.SemiBold,
-                            )
+                        Text(
+                            text = currentRoute?.substringBefore("/") ?: "CampusConnect",
+                            color = AppThemeColor,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Medium,
+                        )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorScheme.surface,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+                        actionIconContentColor = MaterialTheme.colorScheme.primary
                     ),
                     modifier = Modifier.wrapContentHeight(),
                     navigationIcon = {
@@ -182,8 +192,8 @@ fun MainScreen(
                 if(!isGuest && currentRoute == Screen.Update.route){
                     FloatingActionButton(
                         onClick = onCreatePostClick,
-                        contentColor = Color(0xFFFF6D6D),
-                        containerColor = colorScheme.onSurface
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     ) {
                         Icon(
                             imageVector = Icons.Default.BorderColor,
@@ -193,7 +203,6 @@ fun MainScreen(
                     }
                 }
             },
-            containerColor = colorScheme.surface
         ) { innerPadding ->
             //Navigation Graph for bottomNav and DrawerNav Screens
             ScreenNavGraph(
@@ -212,13 +221,13 @@ fun DrawerContent(
     drawerItems: List<DrawerItem>,
     screenNavController: NavHostController,
     isGuest:Boolean,
+    drawerOpenTrigger: Any,
     onGuestLogin: () -> Unit,
     onUserLogout: () -> Unit,
     closeDrawer: () -> Unit,
 ) {
     ModalDrawerSheet(
-        modifier = Modifier
-            .width(280.dp), //Remove height to bring back to default drawer height
+        modifier = Modifier.width(280.dp), //Remove height to bring back to default drawer height
         drawerContainerColor = colorScheme.surface,
         drawerShape = RoundedCornerShape(bottomEnd = 30.dp),
 //        windowInsets = WindowInsets.statusBars
@@ -226,7 +235,7 @@ fun DrawerContent(
         //Header
         Column(
             modifier = Modifier
-                .background(Color(0xFFFF6D6D))
+                .background(MaterialTheme.colorScheme.primary)
                 .fillMaxWidth()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -235,34 +244,20 @@ fun DrawerContent(
             Row (
                 verticalAlignment = Alignment.CenterVertically
             ){
-//                CCLogo() //Need to fix this to use previously made logo, size is the problem for now
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.3f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "CC",
-                        color = Color.White,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 24.sp
-                    )
-                }
+                CCLogo(2.8f,triggerKey = drawerOpenTrigger) // This logo method is Defined in SplashScreen
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "CampusConnect",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = if (isGuest) "@ Guest User" else "Welcome Back!",
                 fontSize = 14.sp,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
         val currentRoute = screenNavController.currentBackStackEntryAsState().value?.destination?.route
@@ -288,12 +283,12 @@ fun DrawerContent(
                     }
                 },
                 colors = NavigationDrawerItemDefaults.colors(
-                    selectedContainerColor = Color.Transparent,
-                    selectedTextColor = Color(0xFFFF6D6D),
-                    selectedIconColor = Color(0xFFFF6D6D),
+                    selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
                     unselectedContainerColor = Color.Transparent,
-                    unselectedTextColor = Color.Black,
-                    unselectedIconColor = Color.Black
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             )
         }
@@ -311,13 +306,11 @@ fun BottomNavigationBar(navController: NavHostController) {
         BottomNavItem("Profile", Screen.Profile.route, Icons.Default.Face),
     )
     Surface (
-        shadowElevation = 12.dp,
+        shadowElevation = 4.dp,
         modifier = Modifier.background(colorScheme.surface)
-//        shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
     ) {
         Box {
             NavigationBar(
-//                containerColor = colorScheme.surface,
             ) {
                 val currentRoute =
                     navController.currentBackStackEntryAsState().value?.destination?.route
@@ -340,11 +333,11 @@ fun BottomNavigationBar(navController: NavHostController) {
                             )
                         },
                         colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent,
-                            selectedIconColor = Color(0xFFFF6D6D),
-                            unselectedIconColor = colorScheme.onBackground.copy(alpha = 0.7f),
-                            selectedTextColor = Color(0xFFFF6D6D),
-                            unselectedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
+                            indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         ),
                         label = {
                             Text(
@@ -358,11 +351,11 @@ fun BottomNavigationBar(navController: NavHostController) {
             }
 
             // Divider Code After Navigation? - Drawn on the top of the Navigation Bar(child defined next in the parent is drawn on the top and then the first one is drawn below it)
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.fillMaxWidth()
                     .align(Alignment.TopCenter)
                     .zIndex(1f), //make sure always on the top and visible
-                color = Color(0xFFFF6D6D),
+                color = colorScheme.primary,
                 thickness = Hairline
             )
         }

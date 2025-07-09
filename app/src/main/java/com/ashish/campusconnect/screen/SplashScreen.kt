@@ -36,8 +36,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ashish.campusconnect.ui.theme.AppThemeColor
 import kotlinx.coroutines.delay
 
 @Composable
@@ -52,7 +54,7 @@ fun SplashScreen(
     LaunchedEffect(true) {
         scale.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
+            animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
         )
         alpha.animateTo(
             targetValue = 1f,
@@ -62,8 +64,7 @@ fun SplashScreen(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 1000, easing = FastOutLinearInEasing)
         )
-
-        delay(2000)
+        delay(1000)
         onNavigate()
     }
 
@@ -111,7 +112,7 @@ fun SplashScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Animated CC Logo
-            CCLogo()
+            CCLogo(8f, 1)
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = "Campus Connect",
@@ -125,34 +126,48 @@ fun SplashScreen(
 }
 
 @Composable
-fun CCLogo(){
-    val scale = remember { Animatable(0f) }
-    LaunchedEffect(true) {
+fun CCLogo(
+    ratio: Float,
+    triggerKey: Any // Pass changing value to restart animation
+) {
+    val outerCircle = ratio * 15
+    val innerCircle = ratio * 13.5
+    val ccText = ratio * 8
+
+    val scale = remember(triggerKey) { Animatable(0f) }
+
+    LaunchedEffect(triggerKey) {
+        scale.snapTo(ratio) // Set to 1 to stable & pinned
         scale.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 4000, easing = FastOutSlowInEasing)
+            animationSpec = tween(
+                durationMillis = 2000,
+                easing = FastOutSlowInEasing
+            )
         )
     }
+
     Box(
-        modifier = Modifier.size(130.dp)
-        .scale(scale.value)
-        .clip(CircleShape)
-        .background(Color.White.copy(alpha = 1f)),
+        modifier = Modifier
+            .size(outerCircle.dp)
+            .scale(scale.value)
+            .clip(CircleShape)
+            .background(Color.White),
         contentAlignment = Alignment.Center
-    ){
+    ) {
         Box(
             modifier = Modifier
-                .size(120.dp)
+                .size(innerCircle.dp)
                 .scale(scale.value)
                 .clip(CircleShape)
-                .background(Color(0xFFFF6D6D)),
+                .background(MaterialTheme.colorScheme.inversePrimary),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "CC",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 72.sp
+                fontSize = ccText.sp
             )
         }
     }
