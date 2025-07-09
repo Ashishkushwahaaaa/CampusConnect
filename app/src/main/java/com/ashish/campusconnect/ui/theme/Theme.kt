@@ -24,7 +24,7 @@ private val DarkColorScheme = darkColorScheme(
     surface = Color(0xFF444444), //DarkGray
     onSurface = Color.White,
     error = Color(0xA7981526),
-    
+
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -85,7 +85,12 @@ fun CampusConnectTheme(
     )
 }
 
+/*
+Some great collection of Color i loved during development phase, i may use it later if needed
 
+0x3481F75D
+
+ */
 
 
 /*

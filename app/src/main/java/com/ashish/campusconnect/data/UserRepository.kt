@@ -125,4 +125,13 @@ class UserRepository(
             Result.Error(e)
         }
     }
+
+    suspend fun sendPasswordResetEmail(email: String): Result<Boolean> {
+        return try {
+            auth.sendPasswordResetEmail(email).await()
+            Result.Success(true)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
 }

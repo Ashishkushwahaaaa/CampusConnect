@@ -36,6 +36,9 @@ class AuthViewModel: ViewModel() {
     private val _isPollingCompleted = MutableLiveData(false)
     val isPollingCompleted: LiveData<Boolean> = _isPollingCompleted
 
+    private val _passwordResetResult = MutableLiveData<Result<Boolean>?>()
+    val passwordResetResult: LiveData<Result<Boolean>?> = _passwordResetResult
+
 
     fun verifyCampusId(role: String, campusId: String) {
         viewModelScope.launch {
@@ -127,6 +130,14 @@ class AuthViewModel: ViewModel() {
         }
     }
 
+    fun resetPassword(email: String) {
+        viewModelScope.launch {
+            _passwordResetResult.value = userRepository.sendPasswordResetEmail(email)
+        }
+    }
+    fun clearPasswordResetResult() {
+        _passwordResetResult.value = null
+    }
     fun clearVerifyResult() {
         _campusIdVerifyResult.value = null
     }

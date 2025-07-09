@@ -69,6 +69,43 @@ fun LoginScreen(
     val sessionManager = remember { SessionManager(context) }
     val coroutineScope = rememberCoroutineScope()
 
+    var showResetDialog by remember { mutableStateOf(false) }
+    var resetEmail by remember { mutableStateOf("") }
+    val resetResult by authViewModel.passwordResetResult.observeAsState()
+
+    if (showResetDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("Reset Password") },
+            text = {
+                Column {
+                    Text("Enter your registered email:")
+                    OutlinedTextField(
+                        value = resetEmail,
+                        onValueChange = { resetEmail = it },
+                        placeholder = { Text("Email") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    authViewModel.resetPassword(resetEmail)
+                }) {
+                    Text("Send Reset Link")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -137,6 +174,24 @@ fun LoginScreen(
                     shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp),
                 ) { Text(text = "Login") }
             }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.End
+            ){
+                Text(
+                    text = "Forgot Password?",
+                    color = Color.Blue,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable {
+                            resetEmail = ""
+                            authViewModel.clearPasswordResetResult()
+                            showResetDialog = true
+                        }
+                )
+
+            }
+
             Text(
                 text = "Don't have an account? Sign Up.",
                 color = Color.Blue,
@@ -163,6 +218,20 @@ fun LoginScreen(
                     }
                 }
             }
+            resetResult?.let { result ->
+                LaunchedEffect(result) {
+                    when (result) {
+                        is Result.Success -> {
+                            Toast.makeText(context, "Reset link sent to $resetEmail", Toast.LENGTH_LONG).show()
+                            showResetDialog = false
+                        }
+                        is Result.Error -> {
+                            Toast.makeText(context, "Failed: ${result.exception.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

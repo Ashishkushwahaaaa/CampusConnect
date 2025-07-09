@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,7 +62,7 @@ import com.ashish.campusconnect.data.SessionManager
 import com.ashish.campusconnect.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 import com.ashish.campusconnect.data.Result
-import com.ashish.campusconnect.ui.theme.AppThemeColor
+//import com.ashish.campusconnect.ui.theme.AppThemeColor
 import com.ashish.campusconnect.ui.theme.Pink40
 import com.ashish.campusconnect.ui.theme.Typography
 
