@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.ashish.campusconnect.R
 
 
 @Composable
@@ -23,7 +24,12 @@ fun HomeScreen(padding: PaddingValues) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        ImageSlider()
+        val images = listOf(
+            R.drawable.image1,
+            R.drawable.image3,
+            R.drawable.image4,
+        )
+        ImageSlider(images)
         // Add other content below...
         Text(text = "About IET Agra", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.SemiBold)
         Spacer(modifier = Modifier.height(12.dp))

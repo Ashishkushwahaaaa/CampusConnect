@@ -1,6 +1,7 @@
 package com.ashish.campusconnect.viewmodel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ashish.campusconnect.data.Post
@@ -28,6 +29,7 @@ class PostViewModel : ViewModel() {
         description: String,
         authorEmail: String,
         thumbnailUri: Uri?,
+        imageUris: List<Uri>,
         attachmentUris: List<Uri>,
     ) {
         viewModelScope.launch {
@@ -35,11 +37,17 @@ class PostViewModel : ViewModel() {
                 _postState.value = PostUploadState.Loading
 
                 var thumbnailUrl = ""
+                val imageUrls = mutableListOf<String>()
                 val attachmentUrls = mutableListOf<String>()
 
                 // Upload Thumbnail if available
                 thumbnailUri?.let {
                     thumbnailUrl = repository.uploadThumbnail(it)
+                }
+                // Upload each image
+                for (uri in imageUris) {
+                    val url = repository.uploadImage(uri)
+                    imageUrls.add(url)
                 }
 
                 // Upload each attachment
@@ -54,11 +62,13 @@ class PostViewModel : ViewModel() {
                     description = description,
                     authorEmail = authorEmail,
                     thumbnailUrl = thumbnailUrl,
+                    imageUrl = imageUrls,
                     attachmentUrls = attachmentUrls
                 )
                 repository.uploadPost(post)
                 _postState.value = PostUploadState.Success
             } catch (e: Exception) {
+                Log.e("PostUpload", "Upload failed", e)
                 _postState.value = PostUploadState.Error(e.message ?: "Unknown error")
             }
         }

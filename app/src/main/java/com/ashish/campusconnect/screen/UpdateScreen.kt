@@ -133,15 +133,22 @@ fun PostItem(
                     Text(
                         text = post.title,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+//                        fontWeight = FontWeight.Bold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(start = 4.dp, end = 4.dp)
                     )
-                } else {
+                } else if(post.description.isNotEmpty()){
                     Text(
                         text = post.description,
                         maxLines = 2,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(start = 4.dp, end = 4.dp)
+                    )
+                }else{
+                    Text(
+                        text = "CampusConnect@IETAgra",
                         style = MaterialTheme.typography.bodyMedium,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(start = 4.dp, end = 4.dp)

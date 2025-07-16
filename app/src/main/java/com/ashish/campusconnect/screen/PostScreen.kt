@@ -37,6 +37,7 @@ fun PostScreen(padding:PaddingValues, onPostUploaded: () -> Unit) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var thumbnailUri by remember { mutableStateOf<Uri?>(null) }
+    var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
     var attachmentUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
     val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email ?: "unknown@user.com"
 
@@ -44,6 +45,12 @@ fun PostScreen(padding:PaddingValues, onPostUploaded: () -> Unit) {
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         thumbnailUri = uri
+    }
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris: List<Uri> ->
+        imageUris = uris
     }
 
     val attachmentPicker = rememberLauncherForActivityResult(
@@ -137,6 +144,50 @@ fun PostScreen(padding:PaddingValues, onPostUploaded: () -> Unit) {
 
         item {
             Button(
+                onClick = { imagePicker.launch(("image/*")) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Pick Images")
+            }
+        }
+        item {
+            if (imageUris.isNotEmpty()) {
+                Text("Selected Images:", style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    imageUris.forEachIndexed { index, uri ->
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(uri)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = "Selected Image ${index + 1}",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp)
+                            )
+                            IconButton(
+                                onClick = {
+                                    imageUris = imageUris.toMutableList().also { it.removeAt(index) }
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(4.dp)
+                                    .size(24.dp)
+                            ) {
+                                Icon(Icons.Default.Delete, contentDescription = "Remove Image")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        item {
+            Button(
                 onClick = { attachmentPicker.launch(arrayOf("application/pdf")) },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -195,6 +246,7 @@ fun PostScreen(padding:PaddingValues, onPostUploaded: () -> Unit) {
                         description = description,
                         authorEmail = currentUserEmail,
                         thumbnailUri = thumbnailUri,
+                        imageUris = imageUris,
                         attachmentUris = attachmentUris
                     )
                 },
@@ -212,6 +264,15 @@ fun PostScreen(padding:PaddingValues, onPostUploaded: () -> Unit) {
                 } else {
                     Text("Upload Post")
                 }
+            }
+
+            if (postState.value is PostUploadState.Error) {
+                val message = (postState.value as PostUploadState.Error).message
+                Text(
+                    text = "Upload failed: $message",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(8.dp)
+                )
             }
         }
     }

@@ -9,6 +9,7 @@ data class Post(
     val description: String = "",
     val authorEmail: String = "",
     var thumbnailUrl: String = "",
+    val imageUrl: List<String> = emptyList(),
     val attachmentUrls: List<String> = emptyList(),
     var upvotes: Int = 0,
 
