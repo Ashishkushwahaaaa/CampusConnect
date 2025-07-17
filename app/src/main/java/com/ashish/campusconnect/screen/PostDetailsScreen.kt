@@ -4,21 +4,22 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Facebook
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Whatsapp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -39,30 +40,31 @@ fun PostDetailsScreen(padding: PaddingValues, post: Post) {
         Contact("Mail Us", "Mail", Icons.Default.Mail),
         Contact("Whatsapp Us" ,"Whatsapp", Icons.Default.Whatsapp)
     )
+    val footerTag = listOf<String>("Developers", "Subscription", "Promotions", "Products", "Services", "Features", "Security", "Report", "Setting", "Account")
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
     ) {
+        //ImageSlider/thumbnail
         item {
-            if(post.imageUrl.isNotEmpty()){
+            if (post.imageUrl.isNotEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .heightIn(350.dp,720.dp)
+                        .heightIn(350.dp, 720.dp)
                         .background(MaterialTheme.colorScheme.background),
                     contentAlignment = Alignment.Center,
-                ){
+                ) {
                     NetworkImageSlider(images = post.imageUrl)
                 }
-            }
-            else{
+            } else {
                 // If there is no ImageContent in the PostDetail, then the thumbnail will be shown
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .aspectRatio(16f/9f)
+                        .aspectRatio(16f / 9f)
                 ) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
@@ -77,28 +79,39 @@ fun PostDetailsScreen(padding: PaddingValues, post: Post) {
                     )
                 }
             }
+        }
+        //Title and divider
+        item {
             Text(
-                text = if(post.title.isEmpty()) "CampusConnect@IETAgra" else post.title,
+                text = if (post.title.isEmpty()) "CampusConnect@IETAgra" else post.title,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(start = 10.dp,end = 10.dp)
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp)
             )
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                thickness = 1.dp
+                thickness = 1.dp,
+                modifier = Modifier.padding(bottom = 8.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+        }
+        //Description
+        item {
             Text(
                 text = post.description,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(start = 10.dp,end = 10.dp),
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp,bottom = 16.dp),
                 textAlign = TextAlign.Justify,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
             )
-            Spacer(modifier = Modifier.height(16.dp))
+        }
+        //Attachments
+        item {
             if (post.attachmentUrls.isNotEmpty()) {
-                Text(text = "Attachments:", fontWeight = FontWeight.SemiBold,modifier = Modifier.padding(start = 10.dp,end = 10.dp))
+                Text(
+                    text = "Attachments:",
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(start = 10.dp,end = 10.dp)
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-
                 post.attachmentUrls.forEachIndexed { index, url ->
                     Text(
                         text = "Attachment ${index + 1}",
@@ -114,44 +127,78 @@ fun PostDetailsScreen(padding: PaddingValues, post: Post) {
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
-        item{
-            // Here i had to implement Footer
-            Box (
+        //Footer
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+            FooterSection(post, contactUs, footerTag)
+        }
+    }
+}
+
+@Composable
+fun FooterSection(post: Post, contactUs: List<Contact>, footerTag: List<String>) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f))
+            .padding(10.dp)
+    ) {
+        Column {
+            Text(
+                text = "Posted By : ${post.authorEmail.substringBefore("@")}",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "Contact Us",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onTertiaryContainer
+            )
+
+            Row(modifier = Modifier.padding(bottom = 12.dp)) {
+                contactUs.forEach { contact ->
+                    IconButton(onClick = { /* TODO */ }) {
+                        Icon(
+                            imageVector = contact.icon,
+                            contentDescription = contact.desc,
+                            tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f)
+                        )
+                    }
+                }
+            }
+
+            Text(
+                text = "CampusConnect@IETAgra",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onTertiaryContainer
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(110.dp),
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 10.dp, end = 10.dp)
-                    .background(MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f))
-            ){
-                Column {
-                    Text(
-                        text = "CampusConnect@IETAgra",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                    )
-                    Text(
-                        text = "Posted By : ${post.authorEmail.substringBefore("@")}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f)
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = "Contact Us",
-                        style = MaterialTheme.typography.displaySmall,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 1f)
-                    )
-                    Row(){
-                        contactUs.forEach {Contact->
-                            IconButton(onClick = {}){
-                                Icon(
-                                    imageVector = Contact.icon,
-                                    contentDescription = Contact.desc,
-                                    tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f)
-                                )
-                            }
+                    .fillMaxWidth()
+                    .heightIn(max = 250.dp)
+                    .padding(vertical = 8.dp)
+            ) {
+                items(footerTag) { item ->
+                    TextButton(
+                        onClick = {
+                            // Handle click actions
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            Text(
+                                text = item,
+                                style = MaterialTheme.typography.bodyMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
                     }
                 }
