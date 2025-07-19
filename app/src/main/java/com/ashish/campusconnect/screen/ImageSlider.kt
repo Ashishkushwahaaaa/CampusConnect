@@ -86,61 +86,6 @@ fun ImageSlider(images: List<Int>) {
 }
 
 //NetworkImageSlider used in post detail screen currently, in future this will be used all where removing local images and replacing with network images
-//@OptIn(ExperimentalPagerApi::class)
-//@Composable
-//fun NetworkImageSlider(images: List<String>) {
-//    val pagerState = rememberPagerState()
-//
-//    LaunchedEffect(key1 = pagerState) {
-//        while (true) {
-//            kotlinx.coroutines.delay(2500)
-//            val nextPage = (pagerState.currentPage + 1) % images.size
-//            pagerState.animateScrollToPage(nextPage)
-//        }
-//    }
-//
-//    Column(
-//        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//    ) {
-//        HorizontalPager(
-//            count = images.size,
-//            state = pagerState,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(250.dp)
-//                .padding(horizontal = 8.dp)
-//        ) { page ->
-//            Card(
-//                modifier = Modifier.fillMaxSize(),
-//                shape = RoundedCornerShape(4.dp),
-//                elevation = CardDefaults.cardElevation(2.dp),
-//                colors = CardDefaults.cardColors(Color.Gray)
-//            ) {
-//                AsyncImage(
-//                    model = images[page],
-//                    contentDescription = "Slider Image",
-//                    contentScale = ContentScale.FillWidth,
-//                    modifier = Modifier
-//                        .padding(2.dp)
-//                        .fillMaxSize()
-//                )
-//            }
-//        }
-//
-//        Spacer(modifier = Modifier.height(12.dp))
-//
-//        HorizontalPagerIndicator(
-//            pagerState = pagerState,
-//            modifier = Modifier.padding(8.dp),
-//            activeColor = MaterialTheme.colorScheme.primary,
-//            indicatorShape = CircleShape
-//        )
-//    }
-//}
-
-
-
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun NetworkImageSlider(images: List<String>) {
@@ -174,7 +119,6 @@ fun NetworkImageSlider(images: List<String>) {
             state = pagerState,
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(180.dp,400.dp)
         ) { page ->
             Card(
                 modifier = Modifier

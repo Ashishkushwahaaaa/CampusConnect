@@ -1,5 +1,7 @@
 package com.ashish.campusconnect.screen
 
+import android.R.attr.name
+import android.R.attr.onClick
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -36,9 +38,9 @@ import com.ashish.campusconnect.data.Post
 fun PostDetailsScreen(padding: PaddingValues, post: Post) {
     val context = LocalContext.current
     val contactUs = listOf (
-        Contact("Call Us", "Call", Icons.Default.Call),
-        Contact("Mail Us", "Mail", Icons.Default.Mail),
-        Contact("Whatsapp Us" ,"Whatsapp", Icons.Default.Whatsapp)
+        Contact("Call", "9889583686", Icons.Default.Call),
+        Contact("Mail", "kushwahaashishaaa@gmail.com", Icons.Default.Mail),
+        Contact("Whatsapp" ,"9889583686", Icons.Default.Whatsapp)
     )
     val footerTag = listOf<String>("Developers", "Subscription", "Promotions", "Products", "Services", "Features", "Security", "Report", "Setting", "Account")
 
@@ -53,7 +55,8 @@ fun PostDetailsScreen(padding: PaddingValues, post: Post) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .heightIn(350.dp, 720.dp)
+                        .heightIn(max = 720.dp)
+//                        .aspectRatio(4f / 3f) //Keep this rather than heightIn() if you want to show the full image within the slider size, for now not recommended
                         .background(MaterialTheme.colorScheme.background),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -76,6 +79,10 @@ fun PostDetailsScreen(padding: PaddingValues, post: Post) {
                         contentScale = ContentScale.Crop,
                         alignment = Alignment.TopCenter,
                         modifier = Modifier.fillMaxSize()
+//                            .clickable(onClick = {
+//                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.thumbnailUrl))
+//                                context.startActivity(intent)
+//                        })
                     )
                 }
             }
@@ -120,7 +127,7 @@ fun PostDetailsScreen(padding: PaddingValues, post: Post) {
                                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                                 context.startActivity(intent)
                             }
-                            .padding(vertical = 4.dp),
+                            .padding(start = 16.dp,top = 4.dp),
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -137,10 +144,11 @@ fun PostDetailsScreen(padding: PaddingValues, post: Post) {
 
 @Composable
 fun FooterSection(post: Post, contactUs: List<Contact>, footerTag: List<String>) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.2f))
             .padding(10.dp)
     ) {
         Column {
@@ -159,10 +167,28 @@ fun FooterSection(post: Post, contactUs: List<Contact>, footerTag: List<String>)
 
             Row(modifier = Modifier.padding(bottom = 12.dp)) {
                 contactUs.forEach { contact ->
-                    IconButton(onClick = { /* TODO */ }) {
+                    IconButton(onClick = {
+                        when(contact.method){
+                            "Call" -> {
+                                val intent = Intent(Intent.ACTION_DIAL)
+                                intent.data = Uri.parse("tel:${contact.value}")
+                                context.startActivity(intent)
+                            }
+                            "Mail" -> {
+                                val intent = Intent(Intent.ACTION_SENDTO)
+                                intent.data = Uri.parse("mailto:${contact.value}")
+                                context.startActivity(intent)
+                            }
+                            "Whatsapp" -> {
+                                val intent = Intent(Intent.ACTION_VIEW)
+                                intent.data = Uri.parse("https://api.whatsapp.com/send?phone=${contact.value}")
+                                context.startActivity(intent)
+                            }
+                        }
+                    }) {
                         Icon(
                             imageVector = contact.icon,
-                            contentDescription = contact.desc,
+                            contentDescription = contact.method,
                             tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.7f)
                         )
                     }

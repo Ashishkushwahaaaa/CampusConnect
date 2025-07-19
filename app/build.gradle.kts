@@ -87,4 +87,8 @@ dependencies {
 
     implementation ("com.google.accompanist:accompanist-pager:0.31.6-rc")
     implementation ("com.google.accompanist:accompanist-pager-indicators:0.31.6-rc")
+
+    //Cropping Image after selecting
+    implementation("com.github.yalantis:ucrop:2.2.8")
+
 }
