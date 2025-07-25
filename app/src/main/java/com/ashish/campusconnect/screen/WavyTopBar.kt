@@ -34,10 +34,9 @@ fun WavyTopBar(
     onSignUpClick: () -> Unit
 ) {
     Box(
-        modifier = Modifier.fillMaxWidth().padding(top = 35.dp)
-
+        modifier = Modifier.fillMaxWidth()
     ){
-        Canvas(modifier = modifier.fillMaxWidth().height(120.dp)) {
+        Canvas(modifier = modifier.fillMaxWidth().height(150.dp)) {
             val width = size.width
             val height = size.height
 
@@ -50,7 +49,7 @@ fun WavyTopBar(
             }
             drawPath(path = path, brush = Brush.verticalGradient( colors = listOf(Color(0xFF9B1616), Color(0xFFFF6D6D)))) // Coral-like red
         }
-        Column (modifier = Modifier.fillMaxWidth().padding(top = 20.dp), horizontalAlignment = Alignment.CenterHorizontally){
+        Column (modifier = Modifier.fillMaxWidth().padding(top = 48.dp), horizontalAlignment = Alignment.CenterHorizontally){
             Text(
                 text = "Welcome to Campus Connect",
                 fontSize = 20.sp,
@@ -87,8 +86,6 @@ fun Modifier.drawUnderline(): Modifier = this.then(
         )
     }
 )
-
-
 
 @Preview
 @Composable

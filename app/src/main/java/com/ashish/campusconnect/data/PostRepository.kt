@@ -15,6 +15,12 @@ class PostRepository(
         ref.putFile(uri).await()
         return ref.downloadUrl.await().toString()
     }
+    suspend fun uploadImage(uri: Uri): String {
+        val ref = storage.reference.child("post_images/${System.currentTimeMillis()}.jpg")
+        ref.putFile(uri).await()
+        return ref.downloadUrl.await().toString()
+    }
+
     suspend fun uploadAttachment(uri: Uri): String {
         val ref = storage.reference.child("post_attachments/${System.currentTimeMillis()}.pdf")
         ref.putFile(uri).await()

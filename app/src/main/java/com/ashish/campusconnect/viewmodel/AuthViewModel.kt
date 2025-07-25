@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ashish.campusconnect.data.Result
+import com.ashish.campusconnect.data.User
 import com.ashish.campusconnect.data.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -34,6 +35,9 @@ class AuthViewModel: ViewModel() {
 
     private val _isPollingCompleted = MutableLiveData(false)
     val isPollingCompleted: LiveData<Boolean> = _isPollingCompleted
+
+    private val _passwordResetResult = MutableLiveData<Result<Boolean>?>()
+    val passwordResetResult: LiveData<Result<Boolean>?> = _passwordResetResult
 
 
     fun verifyCampusId(role: String, campusId: String) {
@@ -108,6 +112,15 @@ class AuthViewModel: ViewModel() {
             _authResult.value = userRepository.finalizeUserRegistration(
                 email, realPassword, firstName, lastName, role, campusId
             )
+
+            // Creating object of user
+            val user = User(
+                email = email,
+                firstName = firstName,
+                lastName = lastName,
+                campusId = campusId,
+                role = role,
+            )
         }
     }
 
@@ -117,6 +130,14 @@ class AuthViewModel: ViewModel() {
         }
     }
 
+    fun resetPassword(email: String) {
+        viewModelScope.launch {
+            _passwordResetResult.value = userRepository.sendPasswordResetEmail(email)
+        }
+    }
+    fun clearPasswordResetResult() {
+        _passwordResetResult.value = null
+    }
     fun clearVerifyResult() {
         _campusIdVerifyResult.value = null
     }

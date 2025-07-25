@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,7 +62,7 @@ import com.ashish.campusconnect.data.SessionManager
 import com.ashish.campusconnect.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 import com.ashish.campusconnect.data.Result
-import com.ashish.campusconnect.ui.theme.AppThemeColor
+//import com.ashish.campusconnect.ui.theme.AppThemeColor
 import com.ashish.campusconnect.ui.theme.Pink40
 import com.ashish.campusconnect.ui.theme.Typography
 
@@ -112,7 +113,7 @@ fun SignUpScreen(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().background(colorScheme.background)) {
         WavyTopBar(
             selectedScreen = AuthScreen.SIGN_UP,
             onSignInClick = { onNavigateToLogin() },
@@ -123,7 +124,6 @@ fun SignUpScreen(
                 .verticalScroll(rememberScrollState())
                 .imePadding()
                 .padding(16.dp)
-                .background(colorScheme.background)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
@@ -135,7 +135,7 @@ fun SignUpScreen(
                 TextButton(onClick = {
                     coroutineScope.launch {
                         sessionManager.setGuestMode(true)
-                        // Navigate to Home Screen
+                        // Navigate to Main Screen
                         onGuestContinue()
                     }
                 }) {

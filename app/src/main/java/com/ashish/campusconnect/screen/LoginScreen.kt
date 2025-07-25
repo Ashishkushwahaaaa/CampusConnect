@@ -20,12 +20,16 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -68,7 +72,48 @@ fun LoginScreen(
     val sessionManager = remember { SessionManager(context) }
     val coroutineScope = rememberCoroutineScope()
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    var showResetDialog by remember { mutableStateOf(false) }
+    var resetEmail by remember { mutableStateOf("") }
+    val resetResult by authViewModel.passwordResetResult.observeAsState()
+
+    if (showResetDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("Reset Password") },
+            text = {
+                Column {
+                    Text("Enter your registered email:")
+                    OutlinedTextField(
+                        value = resetEmail,
+                        onValueChange = { resetEmail = it },
+                        placeholder = { Text("Email") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    authViewModel.resetPassword(resetEmail)
+                }) {
+                    Text("Send Reset Link")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorScheme.background)
+    ) {
         WavyTopBar(
             selectedScreen = AuthScreen.SIGN_IN,
             onSignInClick = {}, // Already on this screen
@@ -79,8 +124,7 @@ fun LoginScreen(
                 .fillMaxSize()
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
-                .imePadding()
-                .background(colorScheme.background),
+                .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -88,19 +132,26 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.End
             ) {
-                TextButton(onClick = {
-                    coroutineScope.launch {
-                        sessionManager.setGuestMode(true)
-                        // Navigate to Home Screen
-                        onGuestContinue()
-                    }
-                }) {
-                    Text("Continue as Guest", color = colorScheme.primary, style = Typography.bodyLarge)
+                TextButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            sessionManager.setGuestMode(true)
+                            // Navigate to Home Screen
+                            onGuestContinue()
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text("Continue as Guest", style = Typography.bodyLarge)
                 }
             }
             Card(
                 modifier = Modifier.wrapContentHeight().fillMaxWidth(),
-                border = BorderStroke(1.dp, color = colorScheme.primary)
+                border = BorderStroke(1.dp, color = colorScheme.primary),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+
             ) {
                 OutlinedTextField(
                     value = email,
@@ -117,6 +168,7 @@ fun LoginScreen(
                     label = { Text("Password*") },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    leadingIcon = {Icon(imageVector = Icons.Default.Key, contentDescription = "Password")},
                     trailingIcon = {
                         val visibilityIcon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                         val description = if (passwordVisible) "Hide password" else "Show password"
@@ -130,12 +182,34 @@ fun LoginScreen(
                     onClick = { authViewModel.login(email, password) },
                     modifier = Modifier.fillMaxWidth().padding(8.dp),
                     shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp),
-//                    enabled = if(email.isNotBlank() && password.isNotBlank()) true else false
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
                 ) { Text(text = "Login") }
             }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.End
+            ){
+                Text(
+                    text = "Forgot Password?",
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable {
+                            resetEmail = ""
+                            authViewModel.clearPasswordResetResult()
+                            showResetDialog = true
+                        }
+                )
+
+            }
+
             Text(
                 text = "Don't have an account? Sign Up.",
-                color = Color.Blue,
+//                color = Color.Blue,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(16.dp).clickable { onNavigateToSignUp() }
             )
 
@@ -159,6 +233,20 @@ fun LoginScreen(
                     }
                 }
             }
+            resetResult?.let { result ->
+                LaunchedEffect(result) {
+                    when (result) {
+                        is Result.Success -> {
+                            Toast.makeText(context, "Reset link sent to $resetEmail", Toast.LENGTH_LONG).show()
+                            showResetDialog = false
+                        }
+                        is Result.Error -> {
+                            Toast.makeText(context, "Failed: ${result.exception.message}", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

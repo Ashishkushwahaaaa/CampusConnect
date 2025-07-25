@@ -83,7 +83,8 @@ class UserRepository(
                 "lastName" to lastName,
                 "role" to role,
                 "campusId" to campusId,
-                "timestamp" to FieldValue.serverTimestamp()
+                "timestamp" to FieldValue.serverTimestamp(),
+//                "password" to realPassword //Never save this data for security reason
             )
 
             firestore.collection("users").document(email).set(userData).await()
@@ -114,4 +115,23 @@ class UserRepository(
         }
     }
 
+    suspend fun getUserDetails(email: String): Result<User> {
+        return try {
+            val doc = firestore.collection("users").document(email).get().await()
+            val user = doc.toObject(User::class.java)
+                ?: throw Exception("User data not found")
+            Result.Success(user)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun sendPasswordResetEmail(email: String): Result<Boolean> {
+        return try {
+            auth.sendPasswordResetEmail(email).await()
+            Result.Success(true)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
 }
