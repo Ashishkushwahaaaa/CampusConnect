@@ -1,0 +1,2 @@
+CampusConnect is a Android application built to simplify college communication. It enables Students and faculty to share real time important update regarding campus as an social media post, only Authentic Studends and Staffs can post, update and delete and for Guest(outsider) posts are view only.Authentication of Students is done by CollegeRollno, same for Staffs with their Ids.
+There is Home Section for college infornmation, Update Section for all uploded updates, Profile Section for users information and Community Section for disscussion.
