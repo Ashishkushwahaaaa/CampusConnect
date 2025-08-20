@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -88,6 +89,7 @@ fun PostDetailsScreen(padding: PaddingValues, post: Post) {
             }
         }
         //Title and divider
+
         item {
             Text(
                 text = if (post.title.isEmpty()) "CampusConnect@IETAgra" else post.title,
@@ -141,7 +143,6 @@ fun PostDetailsScreen(padding: PaddingValues, post: Post) {
         }
     }
 }
-
 @Composable
 fun FooterSection(post: Post, contactUs: List<Contact>, footerTag: List<String>) {
     val context = LocalContext.current
@@ -168,20 +169,23 @@ fun FooterSection(post: Post, contactUs: List<Contact>, footerTag: List<String>)
             Row(modifier = Modifier.padding(bottom = 12.dp)) {
                 contactUs.forEach { contact ->
                     IconButton(onClick = {
-                        when(contact.method){
+                        when (contact.method) {
                             "Call" -> {
                                 val intent = Intent(Intent.ACTION_DIAL)
                                 intent.data = Uri.parse("tel:${contact.value}")
                                 context.startActivity(intent)
                             }
+
                             "Mail" -> {
                                 val intent = Intent(Intent.ACTION_SENDTO)
                                 intent.data = Uri.parse("mailto:${contact.value}")
                                 context.startActivity(intent)
                             }
+
                             "Whatsapp" -> {
                                 val intent = Intent(Intent.ACTION_VIEW)
-                                intent.data = Uri.parse("https://api.whatsapp.com/send?phone=${contact.value}")
+                                intent.data =
+                                    Uri.parse("https://api.whatsapp.com/send?phone=${contact.value}")
                                 context.startActivity(intent)
                             }
                         }

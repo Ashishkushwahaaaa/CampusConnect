@@ -2,6 +2,7 @@ package com.ashish.campusconnect.screen
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,13 +28,15 @@ import coil.request.ImageRequest
 import com.ashish.campusconnect.viewmodel.PostUploadState
 import com.ashish.campusconnect.viewmodel.PostViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.ai.client.generativeai.GenerativeModel
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun PostScreen(padding:PaddingValues, onPostUploaded: () -> Unit) {
     val viewModel: PostViewModel = viewModel()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var thumbnailUri by remember { mutableStateOf<Uri?>(null) }
@@ -66,6 +69,14 @@ fun PostScreen(padding:PaddingValues, onPostUploaded: () -> Unit) {
             onPostUploaded()
         }
     }
+    // 🔑 Initialize Gemini Model (Replace with your API Key from Google AI Studio)
+    val generativeModel = remember {
+        GenerativeModel(
+            modelName = "gemini-1.5-flash",
+            apiKey = "AIzaSyDScLyTUtmf-2KI8wKtLJq0GcyYPjNY78Q"
+        )
+    }
+
 
     // Scrollable content
     LazyColumn(
@@ -91,6 +102,32 @@ fun PostScreen(padding:PaddingValues, onPostUploaded: () -> Unit) {
                     .heightIn(64.dp, 200.dp),
                 maxLines = 3
             )
+        }
+
+        // 👉 Add Auto-Generate Button
+        item {
+            Button(
+                onClick = {
+                    if (title.isNotBlank()) {
+                        coroutineScope.launch {
+                            try {
+                                val response = generativeModel.generateContent(
+                                    ("Write a short professional post description for: $title")
+                                )
+                                description = response.text ?: "Could not generate description"
+                                Log.d("GeminiResponse", response.toString())
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "AI failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(context, "Please enter a title first", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("✨ Auto-Generate Description")
+            }
         }
 
         item {
@@ -277,7 +314,6 @@ fun PostScreen(padding:PaddingValues, onPostUploaded: () -> Unit) {
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
